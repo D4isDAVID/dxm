@@ -1,0 +1,13 @@
+[package]
+name = "dxm"
+version = "0.1.0-dev"
+authors = ["David Malchin <malchin459@gmail.com>"]
+edition = "2021"
+rust-version = "1.56"
+description = "A manager for your FXServer builds & resources."
+repository = "https://github.com/D4isDAVID/dxm"
+license = "MIT"
+keywords = ["fivem", "redm", "fxserver", "cfx", "citizenfx"]
+categories = ["command-line-utilities"]
+
+[dependencies]

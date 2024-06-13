@@ -1,0 +1,6 @@
+# Cargo build output
+/target/
+
+# IDE-related
+/.idea/
+/.vscode/
