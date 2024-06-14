@@ -1,11 +1,10 @@
-use dxm::commands::{cli, execute};
-use log::error;
+use dxm::commands;
 
 fn main() -> anyhow::Result<()> {
-    let args = cli().get_matches();
+    let args = commands::cli().get_matches();
 
-    if let Err(e) = execute(&args) {
-        error!("{e}");
+    if let Err(e) = commands::execute(&args) {
+        log::error!("{e}");
         std::process::exit(1);
     }
 
