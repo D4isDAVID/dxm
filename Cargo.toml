@@ -11,3 +11,7 @@ keywords = ["fivem", "redm", "fxserver", "cfx", "citizenfx"]
 categories = ["command-line-utilities"]
 
 [dependencies]
+anyhow = "1.0"
+clap = { version = "4.5", features = ["cargo", "env"] }
+fern = "0.6.2"
+log = "0.4.21"
