@@ -67,7 +67,8 @@ impl CliContext {
         let bin_dir = self.home.bin_dir();
 
         log::trace!("creating dirs");
-        fs_err::create_dir_all(bin_dir)?;
+        #[allow(clippy::needless_borrows_for_generic_args)]
+        fs_err::create_dir_all(&bin_dir)?;
 
         if self.exe_in_home()? {
             log::trace!("executable already in installation");
