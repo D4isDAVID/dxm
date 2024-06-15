@@ -1,5 +1,9 @@
 use clap::{Arg, ArgAction, ArgMatches, Command};
 
+use crate::context::CliContext;
+
+pub mod self_cmd;
+
 pub fn cli() -> Command {
     Command::new(clap::crate_name!())
         .about(clap::crate_description!())
@@ -19,11 +23,20 @@ pub fn cli() -> Command {
                 .action(ArgAction::SetTrue)
                 .global(true),
         )
+        .subcommand(self_cmd::cli())
+        .arg_required_else_help(true)
 }
 
 pub fn execute(args: &ArgMatches) -> anyhow::Result<()> {
-    #[allow(clippy::needless_borrow)]
-    crate::log::init(determine_log_level(&args))?;
+    crate::log::init(determine_log_level(args))?;
+
+    log::trace!("initializing context");
+    let context = CliContext::new_default()?;
+
+    match args.subcommand() {
+        Some(("self", m)) => self_cmd::execute(&context, m)?,
+        _ => unreachable!(),
+    }
 
     Ok(())
 }
