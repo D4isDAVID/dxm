@@ -9,4 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [unreleased commits]
 
+### Added
+
+- `self setup` command for setting up the installation.
+- `self uninstall` command for uninstalling the program.
+
 [unreleased commits]: https://github.com/D4isDAVID/dxm/commits
