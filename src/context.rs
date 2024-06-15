@@ -67,7 +67,7 @@ impl CliContext {
         let bin_dir = self.home.bin_dir();
 
         log::trace!("creating dirs");
-        fs_err::create_dir_all(&bin_dir)?;
+        fs_err::create_dir_all(bin_dir)?;
 
         if self.exe_in_home()? {
             log::trace!("executable already in installation");
@@ -83,6 +83,15 @@ impl CliContext {
                 ENV_SCRIPT.replace("{dxm_bin}", &format!("{}", bin_dir.display())),
             )?;
         }
+
+        Ok(())
+    }
+
+    pub fn uninstall(&self) -> anyhow::Result<()> {
+        let home_dir = self.home.path();
+
+        log::trace!("deleting home dir");
+        fs_err::remove_dir_all(home_dir)?;
 
         Ok(())
     }
