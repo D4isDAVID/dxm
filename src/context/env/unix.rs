@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use anyhow::anyhow;
 
-use crate::fs_utils;
+use crate::fs_util;
 
 use super::ContextEnv;
 
@@ -35,11 +35,11 @@ impl ContextEnv for UnixContextEnv {
             .ok_or_else(|| anyhow!("couldn't find home directory"))?
             .join(".profile");
 
-        if fs_utils::exists_and_contains_line(&profile, &source_line)? {
+        if fs_util::exists_and_contains_line(&profile, &source_line)? {
             return Ok(false);
         }
 
-        fs_utils::write_or_append(&profile, format!("\n{source_line}\n").as_bytes())?;
+        fs_util::write_or_append(&profile, format!("\n{source_line}\n").as_bytes())?;
 
         Ok(true)
     }
@@ -51,11 +51,11 @@ impl ContextEnv for UnixContextEnv {
             .ok_or_else(|| anyhow!("couldn't find home directory"))?
             .join(".profile");
 
-        if !fs_utils::exists_and_contains_line(&profile, &source_line)? {
+        if !fs_util::exists_and_contains_line(&profile, &source_line)? {
             return Ok(false);
         }
 
-        fs_utils::replace(&profile, &source_line, "")?;
+        fs_util::replace(&profile, &source_line, "")?;
 
         Ok(true)
     }
