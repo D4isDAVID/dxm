@@ -24,7 +24,7 @@ impl WindowsContextEnv {
 
 impl ContextEnv for WindowsContextEnv {
     fn add(&self) -> anyhow::Result<bool> {
-        let path = fs_err::canonicalize(&self.bin_dir)?;
+        let path = dunce::canonicalize(&self.bin_dir)?;
         let env = env_regkey()?;
         let env_path: String = env.get_value(ENV_PATH)?;
 
@@ -38,7 +38,7 @@ impl ContextEnv for WindowsContextEnv {
     }
 
     fn remove(&self) -> anyhow::Result<bool> {
-        let path = fs_err::canonicalize(&self.bin_dir)?;
+        let path = dunce::canonicalize(&self.bin_dir)?;
         let env = env_regkey()?;
         let env_path: String = env.get_value(ENV_PATH)?;
 
@@ -58,7 +58,7 @@ impl ContextEnv for WindowsContextEnv {
 fn env_path_includes(env_path: &str, path: &Path) -> bool {
     env_path
         .split(';')
-        .map(|s| fs_err::canonicalize(Path::new(s)))
+        .map(|s| dunce::canonicalize(Path::new(s)))
         .any(|r| match r {
             Ok(p) => p == path,
             Err(_) => false,

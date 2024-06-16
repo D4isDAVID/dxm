@@ -32,7 +32,7 @@ impl Home {
         P: Into<PathBuf>,
     {
         let path = path.into();
-        log::debug!("using home path {path:?}");
+        log::debug!("using home path {}", path.display());
 
         Self { path }
     }

@@ -14,6 +14,7 @@ categories = ["command-line-utilities"]
 anyhow = "1.0"
 clap = { version = "4.5", features = ["cargo", "env"] }
 dirs = "5.0"
+dunce = "1.0.4"
 fern = "0.6.2"
 fs-err = { version = "2.11" }
 lazycell = "1.3"

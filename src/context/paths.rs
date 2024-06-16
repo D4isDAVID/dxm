@@ -24,7 +24,7 @@ impl ContextPaths {
     pub fn cwd(&self) -> anyhow::Result<&Path> {
         self.cwd
             .try_borrow_with(|| {
-                let path = fs_err::canonicalize(std::env::current_dir()?)?;
+                let path = dunce::canonicalize(std::env::current_dir()?)?;
                 Ok(path)
             })
             .map(AsRef::as_ref)
@@ -33,7 +33,7 @@ impl ContextPaths {
     pub fn exe(&self) -> anyhow::Result<&Path> {
         self.exe
             .try_borrow_with(|| {
-                let path = fs_err::canonicalize(std::env::current_exe()?)?;
+                let path = dunce::canonicalize(std::env::current_exe()?)?;
                 Ok(path)
             })
             .map(AsRef::as_ref)
