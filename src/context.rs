@@ -1,10 +1,11 @@
-use std::{fs, path::PathBuf};
+use std::path::{Path, PathBuf};
 
 use anyhow::anyhow;
 use env::{get_cli_context_env, ContextEnv};
+use lazycell::LazyCell;
 use paths::ContextPaths;
 
-use crate::home::Home;
+use crate::{home::Home, manifest::Manifest, server::Server};
 
 pub mod env;
 pub mod paths;
@@ -17,6 +18,8 @@ pub struct CliContext {
     home: Home,
     paths: ContextPaths,
     env: Box<dyn ContextEnv>,
+    manifest: LazyCell<Manifest>,
+    server: LazyCell<Server>,
 }
 
 impl CliContext {
@@ -28,7 +31,10 @@ impl CliContext {
         Ok(CliContext::new(&home_dir))
     }
 
-    pub fn new(home_dir: &PathBuf) -> CliContext {
+    pub fn new<P>(home_dir: P) -> CliContext
+    where
+        P: Into<PathBuf> + Clone,
+    {
         let home = Home::from_env_or(home_dir);
         let env_sh = home.env_sh();
         let bin_dir = home.bin_dir();
@@ -37,6 +43,8 @@ impl CliContext {
             home,
             paths: ContextPaths::new(),
             env: get_cli_context_env(env_sh, bin_dir),
+            manifest: LazyCell::new(),
+            server: LazyCell::new(),
         }
     }
 
@@ -52,6 +60,50 @@ impl CliContext {
         &*self.env
     }
 
+    pub fn find_manifest<P>(&mut self, path: Option<P>) -> anyhow::Result<()>
+    where
+        P: AsRef<Path>,
+    {
+        let path = path.map_or_else(
+            || Manifest::find_file(self.paths.cwd()?),
+            |p| Manifest::find_file(p),
+        )?;
+
+        log::debug!("using manifest path {}", path.display());
+        self.paths.set_manifest(path);
+
+        Ok(())
+    }
+
+    pub fn manifest(&self) -> anyhow::Result<&Manifest> {
+        self.manifest.try_borrow_with(|| {
+            let path = self
+                .paths
+                .manifest()
+                .ok_or_else(|| anyhow!("no manifest path"))?;
+
+            Manifest::from_file(path)
+        })
+    }
+
+    pub fn server(&self) -> anyhow::Result<&Server> {
+        self.server.try_borrow_with(|| {
+            let manifest = self.manifest()?;
+            std::env::set_current_dir(
+                self.paths
+                    .manifest()
+                    .ok_or_else(|| anyhow!("no manifest path"))?
+                    .parent()
+                    .ok_or_else(|| anyhow!("no parent for manifest path"))?,
+            )?;
+
+            let server = Server::from_manifest(manifest);
+            std::env::set_current_dir(self.paths.cwd()?)?;
+
+            server
+        })
+    }
+
     pub fn exe_in_home(&self) -> anyhow::Result<bool> {
         let current_exe = self.paths.exe()?;
         let home_exe = self.home.dxm_exe();
@@ -60,7 +112,7 @@ impl CliContext {
             return Ok(false);
         }
 
-        Ok(current_exe == fs::canonicalize(home_exe)?)
+        Ok(current_exe == dunce::canonicalize(home_exe)?)
     }
 
     pub fn setup_home(&self) -> anyhow::Result<()> {

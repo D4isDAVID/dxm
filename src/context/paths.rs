@@ -5,6 +5,7 @@ use lazycell::LazyCell;
 pub struct ContextPaths {
     cwd: LazyCell<PathBuf>,
     exe: LazyCell<PathBuf>,
+    manifest: Option<PathBuf>,
 }
 
 impl Default for ContextPaths {
@@ -12,6 +13,7 @@ impl Default for ContextPaths {
         Self {
             cwd: LazyCell::new(),
             exe: LazyCell::new(),
+            manifest: None,
         }
     }
 }
@@ -37,5 +39,16 @@ impl ContextPaths {
                 Ok(path)
             })
             .map(AsRef::as_ref)
+    }
+
+    pub fn manifest(&self) -> Option<&PathBuf> {
+        self.manifest.as_ref()
+    }
+
+    pub fn set_manifest<P>(&mut self, path: P)
+    where
+        P: Into<PathBuf>,
+    {
+        self.manifest = Some(path.into());
     }
 }

@@ -2,6 +2,7 @@ use clap::{Arg, ArgAction, ArgMatches, Command};
 
 use crate::context::CliContext;
 
+pub mod run;
 pub mod self_cmd;
 
 pub fn cli() -> Command {
@@ -23,6 +24,7 @@ pub fn cli() -> Command {
                 .action(ArgAction::SetTrue)
                 .global(true),
         )
+        .subcommand(run::cli())
         .subcommand(self_cmd::cli())
         .arg_required_else_help(true)
 }
@@ -31,9 +33,10 @@ pub fn execute(args: &ArgMatches) -> anyhow::Result<()> {
     crate::log::init(determine_log_level(args))?;
 
     log::trace!("initializing context");
-    let context = CliContext::new_default()?;
+    let mut context = CliContext::new_default()?;
 
     match args.subcommand() {
+        Some(("run", m)) => run::execute(&mut context, m)?,
         Some(("self", m)) => self_cmd::execute(&context, m)?,
         _ => unreachable!(),
     }
