@@ -143,6 +143,9 @@ impl CliContext {
     pub fn uninstall(&self) -> anyhow::Result<()> {
         let home_dir = self.home.path();
 
+        log::trace!("deleting self");
+        self_replace::self_delete_outside_path(home_dir)?;
+
         log::trace!("deleting home dir");
         fs_err::remove_dir_all(home_dir)?;
 
