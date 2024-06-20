@@ -4,7 +4,7 @@ use crate::context::CliContext;
 
 pub fn cli() -> Command {
     Command::new("uninstall")
-        .about("Uninstall dxm.")
+        .about("Uninstall dxm")
         .arg(
             Arg::new("path")
                 .help("Don't modify the environment PATH")

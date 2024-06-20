@@ -7,7 +7,7 @@ pub mod uninstall;
 
 pub fn cli() -> Command {
     Command::new("self")
-        .about("Manage the dxm installation.")
+        .about("Manage the dxm installation")
         .subcommand(setup::cli())
         .subcommand(uninstall::cli())
         .arg_required_else_help(true)

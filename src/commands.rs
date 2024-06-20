@@ -12,6 +12,7 @@ pub fn cli() -> Command {
         .author(clap::crate_authors!())
         .arg(
             Arg::new("verbose")
+                .help("Print trace and debug logs")
                 .long("verbose")
                 .short('v')
                 .action(ArgAction::SetTrue)
@@ -19,6 +20,7 @@ pub fn cli() -> Command {
         )
         .arg(
             Arg::new("quiet")
+                .help("Don't print any logs")
                 .long("quiet")
                 .short('q')
                 .action(ArgAction::SetTrue)

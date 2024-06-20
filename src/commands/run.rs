@@ -6,11 +6,21 @@ use crate::context::CliContext;
 
 pub fn cli() -> Command {
     Command::new("run")
-        .about("Start a dxm-managed server.")
-        .arg(Arg::new("path").value_parser(clap::value_parser!(PathBuf)))
-        .arg(Arg::new("tx-profile").long("tx-profile").short('t'))
+        .about("Start a dxm-managed server")
+        .arg(
+            Arg::new("server-path")
+                .help("The path to the dxm-managed server")
+                .value_parser(clap::value_parser!(PathBuf)),
+        )
+        .arg(
+            Arg::new("tx-profile")
+                .help("When using txAdmin, the profile to use")
+                .long("tx-profile")
+                .short('t'),
+        )
         .arg(
             Arg::new("server-args")
+                .help("Extra args for FXServer")
                 .num_args(0..)
                 .allow_hyphen_values(true)
                 .trailing_var_arg(true),

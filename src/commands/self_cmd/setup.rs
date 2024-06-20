@@ -4,7 +4,7 @@ use crate::context::CliContext;
 
 pub fn cli() -> Command {
     Command::new("setup")
-        .about("Set up the dxm installation.")
+        .about("Set up the dxm installation")
         .arg(
             Arg::new("path")
                 .help("Don't modify the environment PATH")
