@@ -22,8 +22,7 @@ pub fn cli() -> Command {
             Arg::new("server-args")
                 .help("Extra args for FXServer")
                 .num_args(0..)
-                .allow_hyphen_values(true)
-                .trailing_var_arg(true),
+                .last(true),
         )
 }
 
