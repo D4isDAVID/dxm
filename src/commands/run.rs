@@ -32,7 +32,7 @@ pub fn execute(context: &mut CliContext, args: &ArgMatches) -> anyhow::Result<()
         .get_many::<String>("server-args")
         .map_or_else(Vec::new, |v| v.collect());
 
-    let path = args.get_one::<PathBuf>("path");
+    let path = args.get_one::<PathBuf>("server-path");
 
     context.find_manifest(path)?;
     let server = context.server()?;
