@@ -1,6 +1,6 @@
 pub mod commands;
-pub mod context;
-pub mod home;
+mod context;
+mod home;
 mod log;
-pub mod manifest;
+mod manifest;
 mod util;
