@@ -5,7 +5,7 @@ use env::{get_cli_context_env, ContextEnv};
 use lazycell::LazyCell;
 use paths::ContextPaths;
 
-use crate::{home::Home, manifest::Manifest, server::Server};
+use crate::{home::Home, manifest::Manifest};
 
 pub mod env;
 pub mod paths;
@@ -19,7 +19,6 @@ pub struct CliContext {
     paths: ContextPaths,
     env: Box<dyn ContextEnv>,
     manifest: LazyCell<Manifest>,
-    server: LazyCell<Server>,
 }
 
 impl CliContext {
@@ -44,7 +43,6 @@ impl CliContext {
             paths: ContextPaths::new(),
             env: get_cli_context_env(env_sh, bin_dir),
             manifest: LazyCell::new(),
-            server: LazyCell::new(),
         }
     }
 
@@ -83,24 +81,6 @@ impl CliContext {
                 .ok_or_else(|| anyhow!("no manifest path"))?;
 
             Manifest::from_file(path)
-        })
-    }
-
-    pub fn server(&self) -> anyhow::Result<&Server> {
-        self.server.try_borrow_with(|| {
-            let manifest = self.manifest()?;
-            std::env::set_current_dir(
-                self.paths
-                    .manifest()
-                    .ok_or_else(|| anyhow!("no manifest path"))?
-                    .parent()
-                    .ok_or_else(|| anyhow!("no parent for manifest path"))?,
-            )?;
-
-            let server = Server::from_manifest(manifest);
-            std::env::set_current_dir(self.paths.cwd()?)?;
-
-            server
         })
     }
 

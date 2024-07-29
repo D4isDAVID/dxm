@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 
 use anyhow::anyhow;
 use serde::{Deserialize, Serialize};
-use server::ServerManifest;
+use server::Server;
 
 use crate::util;
 
@@ -12,11 +12,11 @@ const MANIFEST_NAME: &str = "dxm.toml";
 
 #[derive(Serialize, Deserialize)]
 pub struct Manifest {
-    server: ServerManifest,
+    server: Server,
 }
 
 impl Manifest {
-    pub fn server(&self) -> &ServerManifest {
+    pub fn server(&self) -> &Server {
         &self.server
     }
 

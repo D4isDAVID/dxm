@@ -35,7 +35,7 @@ pub fn execute(context: &mut CliContext, args: &ArgMatches) -> anyhow::Result<()
     let path = args.get_one::<PathBuf>("server-path");
 
     context.find_manifest(path)?;
-    let server = context.server()?;
+    let server = context.manifest()?.server();
 
     match args.get_one::<String>("tx-profile") {
         Some(profile) => server.run_tx(profile, server_args)?,
