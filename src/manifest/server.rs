@@ -1,4 +1,8 @@
-use std::{ffi::OsStr, path::PathBuf, process::Command};
+use std::{
+    ffi::OsStr,
+    path::{Path, PathBuf},
+    process::Command,
+};
 
 use serde::{Deserialize, Serialize};
 
@@ -17,32 +21,58 @@ pub struct Server {
 }
 
 impl Server {
-    pub fn artifact(&self) -> anyhow::Result<PathBuf> {
-        (|| dunce::canonicalize(&self.artifact_dir)?.expect_dir())()
+    pub fn artifact<P>(&self, base_path: P) -> anyhow::Result<PathBuf>
+    where
+        P: AsRef<Path>,
+    {
+        base_path
+            .as_ref()
+            .join(&self.artifact_dir)
+            .canonical_dir()
             .prefix_err("invalid artifact path")
     }
 
-    pub fn data(&self) -> anyhow::Result<PathBuf> {
-        (|| dunce::canonicalize(&self.data_dir)?.expect_dir())().prefix_err("invalid data path")
+    pub fn data<P>(&self, base_path: P) -> anyhow::Result<PathBuf>
+    where
+        P: AsRef<Path>,
+    {
+        base_path
+            .as_ref()
+            .join(&self.data_dir)
+            .canonical_dir()
+            .prefix_err("invalid data path")
     }
 
-    pub fn cfg(&self) -> anyhow::Result<PathBuf> {
-        (|| dunce::canonicalize(&self.cfg_file)?.expect_file())().prefix_err("invalid cfg path")
+    pub fn cfg<P>(&self, base_path: P) -> anyhow::Result<PathBuf>
+    where
+        P: AsRef<Path>,
+    {
+        base_path
+            .as_ref()
+            .join(&self.cfg_file)
+            .canonical_file()
+            .prefix_err("invalid cfg path")
     }
 
-    pub fn fxserver_exe(&self) -> anyhow::Result<PathBuf> {
-        (|| dunce::canonicalize(self.artifact_dir.join(FXSERVER_EXECUTABLE))?.expect_file())()
+    pub fn fxserver_exe<P>(&self, base_path: P) -> anyhow::Result<PathBuf>
+    where
+        P: AsRef<Path>,
+    {
+        self.artifact(base_path)?
+            .join(FXSERVER_EXECUTABLE)
+            .canonical_file()
             .prefix_err(format!("invalid {} inside artifact", FXSERVER_EXECUTABLE))
     }
 
-    pub fn run<V, S>(&self, server_args: V) -> anyhow::Result<()>
+    pub fn run<P, V, S>(&self, base_path: P, server_args: V) -> anyhow::Result<()>
     where
+        P: AsRef<Path>,
         V: IntoIterator<Item = S>,
         S: AsRef<OsStr>,
     {
-        let data = self.data()?;
-        let cfg = self.cfg()?;
-        let exe = self.fxserver_exe()?;
+        let data = self.data(&base_path)?;
+        let cfg = self.cfg(&base_path)?;
+        let exe = self.fxserver_exe(&base_path)?;
 
         log::debug!("running server with {}", exe.display());
         log::debug!("using data path {}", data.display());
@@ -58,16 +88,17 @@ impl Server {
         Ok(())
     }
 
-    pub fn run_tx<P, V, S>(&self, profile: P, server_args: V) -> anyhow::Result<()>
+    pub fn run_tx<P, S, V, A>(&self, base_path: P, profile: S, server_args: V) -> anyhow::Result<()>
     where
-        P: AsRef<str>,
-        V: IntoIterator<Item = S>,
-        S: AsRef<OsStr>,
+        P: AsRef<Path>,
+        S: AsRef<str>,
+        V: IntoIterator<Item = A>,
+        A: AsRef<OsStr>,
     {
         let profile = profile.as_ref();
         let server_args = server_args.into_iter();
 
-        let exe = self.fxserver_exe()?;
+        let exe = self.fxserver_exe(base_path)?;
 
         log::debug!("running txAdmin with {}", exe.display());
         log::debug!("using profile {profile}");

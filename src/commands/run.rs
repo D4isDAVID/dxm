@@ -38,11 +38,16 @@ pub fn execute(context: &mut CliContext, args: &ArgMatches) -> anyhow::Result<()
         .prefix_err("invalid server path specified")?;
 
     context.find_manifest(path)?;
+    let base_path = context
+        .paths()
+        .manifest()
+        .and_then(|p| p.parent())
+        .expect("expected manifest path");
     let server = context.manifest()?.server();
 
     match args.get_one::<String>("tx-profile") {
-        Some(profile) => server.run_tx(profile, server_args)?,
-        None => server.run(server_args)?,
+        Some(profile) => server.run_tx(base_path, profile, server_args)?,
+        None => server.run(base_path, server_args)?,
     };
 
     log::info!("finished");

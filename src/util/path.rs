@@ -2,25 +2,27 @@ use std::path::PathBuf;
 
 use anyhow::bail;
 
-pub trait PathUtil: Sized {
-    fn expect_file(self) -> anyhow::Result<Self>;
-    fn expect_dir(self) -> anyhow::Result<Self>;
+pub trait PathUtil {
+    fn canonical_file(&self) -> anyhow::Result<PathBuf>;
+    fn canonical_dir(&self) -> anyhow::Result<PathBuf>;
 }
 
 impl PathUtil for PathBuf {
-    fn expect_file(self) -> anyhow::Result<Self> {
-        if !self.is_file() {
+    fn canonical_file(&self) -> anyhow::Result<PathBuf> {
+        let path = dunce::canonicalize(self)?;
+        if !path.is_file() {
             bail!("this is not a file");
         }
 
-        Ok(self)
+        Ok(path)
     }
 
-    fn expect_dir(self) -> anyhow::Result<Self> {
-        if !self.is_dir() {
+    fn canonical_dir(&self) -> anyhow::Result<PathBuf> {
+        let path = dunce::canonicalize(self)?;
+        if !path.is_dir() {
             bail!("this is not a directory");
         }
 
-        Ok(self)
+        Ok(path)
     }
 }
