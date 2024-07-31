@@ -29,7 +29,7 @@ pub fn cli() -> Command {
 pub fn execute(context: &mut CliContext, args: &ArgMatches) -> anyhow::Result<()> {
     let server_args = args
         .get_many::<String>("server-args")
-        .map_or_else(Vec::new, |v| v.collect());
+        .map_or_else(Vec::new, Iterator::collect);
 
     let path = args.get_one::<PathBuf>("server-path");
 

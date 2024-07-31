@@ -58,7 +58,8 @@ impl ContextEnv for WindowsContextEnv {
 fn env_path_includes(env_path: &str, path: &Path) -> bool {
     env_path
         .split(';')
-        .map(|s| dunce::canonicalize(Path::new(s)))
+        .map(Path::new)
+        .map(dunce::canonicalize)
         .any(|r| match r {
             Ok(p) => p == path,
             Err(_) => false,
