@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use clap::{Arg, ArgMatches, Command};
 
-use crate::context::CliContext;
+use crate::{context::CliContext, util::result::ResultUtil};
 
 pub fn cli() -> Command {
     Command::new("run")
@@ -31,7 +31,11 @@ pub fn execute(context: &mut CliContext, args: &ArgMatches) -> anyhow::Result<()
         .get_many::<String>("server-args")
         .map_or_else(Vec::new, Iterator::collect);
 
-    let path = args.get_one::<PathBuf>("server-path");
+    let path = args
+        .get_one::<PathBuf>("server-path")
+        .map(dunce::canonicalize)
+        .transpose()
+        .prefix_err("invalid server path specified")?;
 
     context.find_manifest(path)?;
     let server = context.manifest()?.server();
