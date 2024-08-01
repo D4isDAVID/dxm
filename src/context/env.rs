@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-#[cfg(not(windows))]
+#[cfg(unix)]
 mod unix;
 
 #[cfg(windows)]
@@ -17,7 +17,7 @@ pub fn get_cli_context_env<P>(env_sh: P, bin_dir: P) -> Box<dyn ContextEnv>
 where
     P: Into<PathBuf>,
 {
-    #[cfg(not(windows))]
+    #[cfg(unix)]
     return Box::new(unix::UnixContextEnv::new(env_sh));
 
     #[cfg(windows)]

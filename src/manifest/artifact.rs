@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::util::{path::PathUtil, result::ResultUtil};
 
-#[cfg(not(windows))]
+#[cfg(unix)]
 const FXSERVER_EXECUTABLE: &str = "run.sh";
 #[cfg(windows)]
 const FXSERVER_EXECUTABLE: &str = "FXServer.exe";

@@ -11,7 +11,7 @@ pub mod env;
 pub mod paths;
 
 const DEFAULT_HOME_DIR: &str = ".dxm";
-#[cfg(not(windows))]
+#[cfg(unix)]
 const ENV_SCRIPT: &str = include_str!("./context/env/env.sh");
 
 pub struct CliContext {
@@ -109,7 +109,7 @@ impl CliContext {
             fs_err::copy(self.paths.exe()?, self.home.dxm_exe())?;
         }
 
-        #[cfg(not(windows))]
+        #[cfg(unix)]
         {
             fs_err::write(
                 self.home.env_sh(),
