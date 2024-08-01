@@ -1,21 +1,28 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::anyhow;
+use artifact::Artifact;
 use serde::{Deserialize, Serialize};
 use server::Server;
 
 use crate::util;
 
+pub mod artifact;
 pub mod server;
 
 const MANIFEST_NAME: &str = "dxm.toml";
 
 #[derive(Serialize, Deserialize)]
 pub struct Manifest {
+    artifact: Artifact,
     server: Server,
 }
 
 impl Manifest {
+    pub fn artifact(&self) -> &Artifact {
+        &self.artifact
+    }
+
     pub fn server(&self) -> &Server {
         &self.server
     }
