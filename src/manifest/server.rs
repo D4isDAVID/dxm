@@ -39,7 +39,12 @@ impl Server {
             .prefix_err("invalid cfg path")
     }
 
-    pub fn run<P, V, S>(&self, base_path: P, artifact: &Artifact, server_args: V) -> anyhow::Result<()>
+    pub fn run<P, V, S>(
+        &self,
+        base_path: P,
+        artifact: &Artifact,
+        server_args: V,
+    ) -> anyhow::Result<()>
     where
         P: AsRef<Path>,
         V: IntoIterator<Item = S>,
@@ -63,7 +68,13 @@ impl Server {
         Ok(())
     }
 
-    pub fn run_tx<P, S, V, A>(&self, base_path: P, artifact: &Artifact, profile: S, server_args: V) -> anyhow::Result<()>
+    pub fn run_tx<P, S, V, A>(
+        &self,
+        base_path: P,
+        artifact: &Artifact,
+        profile: S,
+        server_args: V,
+    ) -> anyhow::Result<()>
     where
         P: AsRef<Path>,
         S: AsRef<str>,

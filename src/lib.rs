@@ -1,3 +1,4 @@
+mod cfx;
 pub mod commands;
 mod context;
 mod home;
