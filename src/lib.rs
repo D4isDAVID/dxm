@@ -1,7 +1,7 @@
 mod cfx;
 pub mod commands;
-mod context;
-mod home;
+pub mod context;
+pub mod home;
 mod log;
-mod manifest;
+pub mod manifest;
 mod util;
