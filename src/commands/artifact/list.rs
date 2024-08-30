@@ -11,10 +11,10 @@ pub fn execute() -> anyhow::Result<()> {
 
     print!(
         "\
-latest:\t\t{}
-optional:\t{}
+latest:     \t{}
+optional:   \t{}
 recommended:\t{}
-critical:\t{}
+critical:   \t{}
 ",
         changelogs.latest(),
         changelogs.optional(),
