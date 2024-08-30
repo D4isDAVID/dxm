@@ -9,6 +9,7 @@ pub fn cli() -> Command {
         .about("Manage the server artifacts")
         .subcommand(list::cli())
         .arg_required_else_help(true)
+        .subcommand_required(true)
 }
 
 pub fn execute(context: &mut CliContext, args: &ArgMatches) -> anyhow::Result<()> {

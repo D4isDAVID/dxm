@@ -31,6 +31,7 @@ pub fn cli() -> Command {
         .subcommand(run::cli())
         .subcommand(self_cmd::cli())
         .arg_required_else_help(true)
+        .subcommand_required(true)
 }
 
 pub fn execute(args: &ArgMatches) -> anyhow::Result<()> {

@@ -11,6 +11,7 @@ pub fn cli() -> Command {
         .subcommand(setup::cli())
         .subcommand(uninstall::cli())
         .arg_required_else_help(true)
+        .subcommand_required(true)
 }
 
 pub fn execute(context: &CliContext, args: &ArgMatches) -> anyhow::Result<()> {
