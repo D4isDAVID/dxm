@@ -1,7 +1,5 @@
 use std::fmt::Display;
 
-use anyhow::anyhow;
-
 pub trait ResultUtil<T> {
     fn prefix_err<S>(self, prefix: S) -> Result<T, anyhow::Error>
     where
@@ -13,6 +11,6 @@ impl<T, E: Display> ResultUtil<T> for Result<T, E> {
     where
         S: AsRef<str> + Display,
     {
-        self.map_err(|e| anyhow!("{}: {}", prefix, e))
+        self.map_err(|e| anyhow::anyhow!("{}: {}", prefix, e))
     }
 }

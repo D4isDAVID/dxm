@@ -2,7 +2,7 @@ use clap::{ArgMatches, Command};
 
 use crate::context::CliContext;
 
-pub mod list;
+mod list;
 
 pub fn cli() -> Command {
     Command::new("artifact")

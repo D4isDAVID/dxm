@@ -1,7 +1,5 @@
 use std::path::PathBuf;
 
-use anyhow::anyhow;
-
 use crate::util;
 
 use super::ContextEnv;
@@ -32,7 +30,7 @@ impl ContextEnv for UnixContextEnv {
         let source_line = self.source_line();
 
         let profile = dirs::home_dir()
-            .ok_or_else(|| anyhow!("couldn't find home directory"))?
+            .ok_or_else(|| anyhow::anyhow!("couldn't find home directory"))?
             .join(".profile");
 
         if util::fs::exists_and_contains_line(&profile, &source_line)? {
@@ -48,7 +46,7 @@ impl ContextEnv for UnixContextEnv {
         let source_line = self.source_line();
 
         let profile = dirs::home_dir()
-            .ok_or_else(|| anyhow!("couldn't find home directory"))?
+            .ok_or_else(|| anyhow::anyhow!("couldn't find home directory"))?
             .join(".profile");
 
         if !util::fs::exists_and_contains_line(&profile, &source_line)? {

@@ -2,8 +2,8 @@ use clap::{ArgMatches, Command};
 
 use crate::context::CliContext;
 
-pub mod setup;
-pub mod uninstall;
+mod setup;
+mod uninstall;
 
 pub fn cli() -> Command {
     Command::new("self")

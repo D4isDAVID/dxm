@@ -1,11 +1,11 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::anyhow;
-use artifact::Artifact;
 use serde::{Deserialize, Serialize};
 use server::Server;
 
 use crate::util;
+
+use self::artifact::Artifact;
 
 pub mod artifact;
 pub mod server;
@@ -37,7 +37,7 @@ impl Manifest {
         while !path.try_exists()? {
             dir = dir
                 .parent()
-                .ok_or_else(|| anyhow!("couldn't find manifest"))?;
+                .ok_or_else(|| anyhow::anyhow!("couldn't find manifest"))?;
             path = dir.join(MANIFEST_NAME);
         }
 

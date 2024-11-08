@@ -2,9 +2,9 @@ use clap::{Arg, ArgAction, ArgMatches, Command};
 
 use crate::context::CliContext;
 
-pub mod artifact;
-pub mod run;
-pub mod self_cmd;
+mod artifact;
+mod run;
+mod self_cmd;
 
 pub fn cli() -> Command {
     Command::new(clap::crate_name!())

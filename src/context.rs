@@ -1,6 +1,5 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::anyhow;
 use env::{get_cli_context_env, ContextEnv};
 use lazycell::LazyCell;
 use paths::ContextPaths;
@@ -24,7 +23,7 @@ pub struct CliContext {
 impl CliContext {
     pub fn new_default() -> anyhow::Result<CliContext> {
         let home_dir = dirs::home_dir()
-            .ok_or_else(|| anyhow!("couldn't find home directory"))?
+            .ok_or_else(|| anyhow::anyhow!("couldn't find home directory"))?
             .join(DEFAULT_HOME_DIR);
 
         Ok(CliContext::new(&home_dir))
@@ -78,7 +77,7 @@ impl CliContext {
             let path = self
                 .paths
                 .manifest()
-                .ok_or_else(|| anyhow!("no manifest path"))?;
+                .ok_or_else(|| anyhow::anyhow!("no manifest path"))?;
 
             Manifest::from_file(path)
         })

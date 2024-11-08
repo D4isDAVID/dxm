@@ -3,7 +3,6 @@ use std::{
     path::Path,
 };
 
-use anyhow::bail;
 use fs_err::OpenOptions;
 
 pub fn replace<P, S>(path: P, from: S, to: &str) -> anyhow::Result<usize>
@@ -37,7 +36,7 @@ where
         })),
         Err(err) => {
             if err.kind() != std::io::ErrorKind::NotFound {
-                bail!(err);
+                anyhow::bail!(err);
             }
 
             Ok(false)
@@ -55,12 +54,12 @@ where
         Ok(file) => BufWriter::new(file),
         Err(err) => {
             if err.kind() != std::io::ErrorKind::AlreadyExists {
-                bail!(err);
+                anyhow::bail!(err);
             }
 
             match OpenOptions::new().append(true).open(path) {
                 Ok(file) => BufWriter::new(file),
-                Err(err) => bail!(err),
+                Err(err) => anyhow::bail!(err),
             }
         }
     };
