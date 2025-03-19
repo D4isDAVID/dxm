@@ -20,7 +20,7 @@ pub struct ParseArtifactsChannelError {
 
 impl Display for ParseArtifactsChannelError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "failed to parse artifacts channel {}", &self.channel)?;
+        write!(f, "unknown artifacts channel {}", &self.channel)?;
 
         Ok(())
     }

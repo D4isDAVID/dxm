@@ -18,8 +18,10 @@ include = [
 [workspace.dependencies]
 dxm-artifacts = { path = "./crates/dxm-artifacts" }
 dxm-home = { path = "./crates/dxm-home" }
+dxm-init = { path = "./crates/dxm-init" }
 dxm-manifest = { path = "./crates/dxm-manifest" }
 fs-err = "3.1.0"
+git2 = "0.20.1"
 log = { version = "0.4.26", features = ["std"] }
 reqwest = { version = "0.12.15", features = ["blocking"] }
 serde = { version = "1.0.219", features = ["derive"] }
@@ -44,6 +46,7 @@ include.workspace = true
 clap = { version = "4.5.32", features = ["cargo", "env"] }
 dxm-artifacts.workspace = true
 dxm-home.workspace = true
+dxm-init.workspace = true
 dxm-manifest.workspace = true
 log.workspace = true
 reqwest.workspace = true

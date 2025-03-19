@@ -1,0 +1,17 @@
+[package]
+name = "dxm-init"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = ""
+repository.workspace = true
+license.workspace = true
+include.workspace = true
+
+[dependencies]
+dxm-manifest.workspace = true
+fs-err.workspace = true
+git2.workspace = true
+log.workspace = true
+serde.workspace = true

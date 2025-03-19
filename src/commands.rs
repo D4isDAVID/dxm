@@ -6,6 +6,8 @@ use clap::{Arg, ArgAction, ArgMatches, Command};
 use log::LevelFilter;
 
 pub mod artifacts;
+pub mod init;
+pub mod new;
 pub mod run;
 pub mod self_cmd;
 
@@ -58,6 +60,8 @@ pub fn cli() -> Command {
                 .global(true),
         )
         .subcommand(artifacts::cli())
+        .subcommand(init::cli())
+        .subcommand(new::cli())
         .subcommand(run::cli())
         .subcommand(self_cmd::cli())
         .arg_required_else_help(true)
@@ -70,6 +74,8 @@ pub fn execute(args: &ArgMatches, options: &ExecuteOptions) -> Result<(), Box<dy
 
     match args.subcommand() {
         Some(("artifacts", m)) => artifacts::execute(m)?,
+        Some(("init", m)) => init::execute(m)?,
+        Some(("new", m)) => new::execute(m)?,
         Some(("run", m)) => run::execute(m)?,
         Some(("self", m)) => self_cmd::execute(m)?,
         _ => unreachable!(),
