@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-[unreleased commits]
+[dxm unreleased]
 
-[unreleased commits]: https://github.com/D4isDAVID/dxm/commits/main/crates/dxm-init
+## 0.1.0 - 2025-03-19
+
+[dxm 0.1.0]
+
+Initial release.
+
+[dxm unreleased]: https://github.com/D4isDAVID/dxm/commits/main/crates/dxm-init
+[dxm 0.1.0]: https://github.com/D4isDAVID/dxm/commits/v0.1.0/crates/dxm-init
