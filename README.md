@@ -5,6 +5,8 @@
 
 A manager for FXServer artifacts & resources.
 
+Need support? Check out the [Discord server](https://discord.gg/rdjpS2K8hC)!
+
 - [Key Features](#key-features)
 - [Installation](#installation)
 - [Usage](#usage)
