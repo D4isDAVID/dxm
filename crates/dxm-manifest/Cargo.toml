@@ -1,0 +1,17 @@
+[package]
+name = "dxm-manifest"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = ""
+repository.workspace = true
+license.workspace = true
+include.workspace = true
+
+[dependencies]
+dxm-artifacts.workspace = true
+fs-err.workspace = true
+log.workspace = true
+serde.workspace = true
+toml = "0.8.20"

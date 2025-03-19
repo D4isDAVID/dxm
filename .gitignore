@@ -2,5 +2,7 @@
 /target/
 
 # IDE-related
-/.idea/
-/.vscode/
+.idea/
+.vscode/*
+!/.vscode/extensions.json
+!/.vscode/settings.json

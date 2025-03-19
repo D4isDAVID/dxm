@@ -1,28 +1,50 @@
-[package]
-name = "dxm"
-version = "0.1.0-dev"
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+
+[workspace.package]
 authors = ["David Malchin <malchin459@gmail.com>"]
-edition = "2021"
-rust-version = "1.65"
-description = "A manager for your FXServer builds & resources."
+edition = "2024"
+rust-version = "1.85"
 repository = "https://github.com/D4isDAVID/dxm"
 license = "MIT"
+include = [
+  "src",
+  "CHANGELOG.md",
+  "LICENSE",
+  "README.md"
+]
+
+[workspace.dependencies]
+dxm-artifacts = { path = "./crates/dxm-artifacts" }
+dxm-home = { path = "./crates/dxm-home" }
+dxm-manifest = { path = "./crates/dxm-manifest" }
+fs-err = "3.1.0"
+log = { version = "0.4.26", features = ["std"] }
+reqwest = { version = "0.12.15", features = ["blocking"] }
+serde = { version = "1.0.219", features = ["derive"] }
+tar = "0.4.44"
+tempfile = "3.19.0"
+zip = { version = "2.4.1", features = ["deflate"], default-features = false }
+
+[package]
+name = "dxm"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "A manager for FXServer artifacts & resources."
+repository.workspace = true
+license.workspace = true
 keywords = ["fivem", "redm", "fxserver", "cfx", "citizenfx"]
 categories = ["command-line-utilities"]
+include.workspace = true
 
 [dependencies]
-anyhow = "1.0"
-clap = { version = "4.5", features = ["cargo", "env"] }
-dirs = "5.0"
-dunce = "1.0"
-fern = "0.6.2"
-fs-err = { version = "2.11" }
-lazycell = "1.3"
-log = "0.4.21"
-reqwest = { version = "0.12.5", features = ["blocking", "json"] }
-self-replace = "1.3"
-serde = { version = "1.0", features = ["derive"] }
-toml = { version = "0.8.14", features = ["preserve_order"] }
-
-[target.'cfg(windows)'.dependencies]
-winreg = "0.52.0"
+clap = { version = "4.5.32", features = ["cargo", "env"] }
+dxm-artifacts.workspace = true
+dxm-home.workspace = true
+dxm-manifest.workspace = true
+log.workspace = true
+reqwest.workspace = true
+fern = "0.7.1"

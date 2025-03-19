@@ -1,13 +1,6 @@
 name: Build
 
-on:
-  pull_request:
-  push:
-    branches:
-      - '**'          # every branch
-      - '!nobuild-**' # unless marked as nobuild
-    tags:
-      - '**'
+on: [push, pull_request]
 
 jobs:
   build:
@@ -38,23 +31,21 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          cargo build --verbose --locked --release
+          cargo build --verbose --locked --release --workspace
 
       - name: Post-build
         id: postbuild
         shell: bash
         run: |
           name="dxm-${{ matrix.type }}"
-          cd target/release
 
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
             name="$name.exe"
-            mv "dxm.exe" "../../$name"
+            mv "./target/release/dxm.exe" "./$name"
           else
-            mv "dxm" "../../$name"
+            mv "./target/release/dxm" "./$name"
           fi
 
-          cd ../..
           echo "name=$name" >> $GITHUB_OUTPUT
 
       - name: Upload executable
@@ -62,7 +53,7 @@ jobs:
         with:
           name: ${{ steps.postbuild.outputs.name }}
           path: ./${{ steps.postbuild.outputs.name }}
-      
+
   publish:
     name: Publish
     runs-on: ubuntu-latest
@@ -74,17 +65,17 @@ jobs:
 
       - name: Download archives
         uses: actions/download-artifact@v4
-        
+
       - name: Archive
         shell: bash
         run: |
           version="${{ github.ref_name }}"
 
           mv -vfT "dxm-windows-x64.exe/dxm-windows-x64.exe" "dxm.exe"
-          7z a "dxm-$version-windows-x64.zip" "dxm.exe"
+          zip "dxm-$version-windows-x64.zip" "dxm.exe"
 
           mv -vfT "dxm-linux-x64/dxm-linux-x64" "dxm"
-          tar -cjvf "dxm-$version-linux-x64.tar.gz" "dxm"
+          tar -czvf "dxm-$version-linux-x64.tar.gz" "dxm"
 
       - name: Draft release
         uses: softprops/action-gh-release@v2

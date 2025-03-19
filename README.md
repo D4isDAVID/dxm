@@ -1,6 +1,6 @@
-# dxManager
+# dxm
 
 > [!NOTE]
 > This project is still in development.
 
-A manager for your FXServer builds & resources.
+A manager for FXServer artifacts & resources.

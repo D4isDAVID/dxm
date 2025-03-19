@@ -1,11 +1,41 @@
+//! Contains code for the commands.
+
+use std::error::Error;
+
 use clap::{Arg, ArgAction, ArgMatches, Command};
+use log::LevelFilter;
 
-use crate::context::CliContext;
+pub mod artifacts;
+pub mod run;
+pub mod self_cmd;
 
-mod artifact;
-mod run;
-mod self_cmd;
+/// Options passed to the top-level `execute` function.
+pub struct ExecuteOptions {
+    /// The log level to use by default.
+    ///
+    /// Default: `Info`
+    pub default_log_level: LevelFilter,
+    /// The log level to use when the verbose flag is on.
+    ///
+    /// Default: `Trace`
+    pub verbose_log_level: LevelFilter,
+    /// The log level to use when the quiet flag is on.
+    ///
+    /// Default: `Off`
+    pub quiet_log_level: LevelFilter,
+}
 
+impl Default for ExecuteOptions {
+    fn default() -> Self {
+        Self {
+            default_log_level: LevelFilter::Info,
+            verbose_log_level: LevelFilter::Trace,
+            quiet_log_level: LevelFilter::Off,
+        }
+    }
+}
+
+/// The command structure.
 pub fn cli() -> Command {
     Command::new(clap::crate_name!())
         .about(clap::crate_description!())
@@ -27,35 +57,33 @@ pub fn cli() -> Command {
                 .action(ArgAction::SetTrue)
                 .global(true),
         )
-        .subcommand(artifact::cli())
+        .subcommand(artifacts::cli())
         .subcommand(run::cli())
         .subcommand(self_cmd::cli())
         .arg_required_else_help(true)
         .subcommand_required(true)
 }
 
-pub fn execute(args: &ArgMatches) -> anyhow::Result<()> {
-    crate::log::init(determine_log_level(args))?;
-
-    log::trace!("initializing context");
-    let mut context = CliContext::new_default()?;
+/// The code ran when using the command.
+pub fn execute(args: &ArgMatches, options: &ExecuteOptions) -> Result<(), Box<dyn Error>> {
+    log::set_max_level(determine_log_level(args, options));
 
     match args.subcommand() {
-        Some(("artifact", m)) => artifact::execute(&mut context, m)?,
-        Some(("run", m)) => run::execute(&mut context, m)?,
-        Some(("self", m)) => self_cmd::execute(&context, m)?,
+        Some(("artifacts", m)) => artifacts::execute(m)?,
+        Some(("run", m)) => run::execute(m)?,
+        Some(("self", m)) => self_cmd::execute(m)?,
         _ => unreachable!(),
     }
 
     Ok(())
 }
 
-fn determine_log_level(args: &ArgMatches) -> log::LevelFilter {
+fn determine_log_level(args: &ArgMatches, options: &ExecuteOptions) -> LevelFilter {
     if args.get_flag("quiet") {
-        log::LevelFilter::Off
+        options.quiet_log_level
     } else if args.get_flag("verbose") {
-        log::LevelFilter::Trace
+        options.verbose_log_level
     } else {
-        log::LevelFilter::Info
+        options.default_log_level
     }
 }

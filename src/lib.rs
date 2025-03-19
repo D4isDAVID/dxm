@@ -1,7 +1,5 @@
-mod cfx;
+//! A crate containing the underlying API of dxm's CLI commands.
+
 pub mod commands;
-mod context;
-mod home;
-mod log;
-mod manifest;
+pub mod log;
 mod util;

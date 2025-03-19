@@ -9,4 +9,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [unreleased commits]
 
-[unreleased commits]: https://github.com/D4isDAVID/dxm/commits
+[unreleased commits]: https://github.com/D4isDAVID/dxm/commits/main/crates/dxm-manifest

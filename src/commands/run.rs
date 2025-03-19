@@ -1,58 +1,56 @@
-use std::path::PathBuf;
+//! Contains the command to start a server.
+
+use std::{error::Error, path::PathBuf};
 
 use clap::{Arg, ArgMatches, Command};
+use dxm_artifacts::cfx::ArtifactsPlatform;
 
-use crate::{context::CliContext, util::result::ResultUtil};
-
+/// The command structure.
 pub fn cli() -> Command {
     Command::new("run")
-        .about("Start a dxm-managed server")
+        .about("Start FXServer")
         .arg(
-            Arg::new("server-path")
-                .help("The path to the dxm-managed server")
-                .value_parser(clap::value_parser!(PathBuf)),
-        )
-        .arg(
-            Arg::new("tx-profile")
-                .help("When using txAdmin, the profile to use")
-                .long("tx-profile")
-                .short('t'),
+            Arg::new("manifest-path")
+                .help("The path to a directory with a dxm manifest")
+                .index(1)
+                .value_parser(clap::value_parser!(PathBuf))
+                .default_value("."),
         )
         .arg(
             Arg::new("server-args")
-                .help("Extra args for FXServer")
-                .num_args(0..)
+                .help("Extra args passed to FXServer")
+                .index(2)
                 .last(true),
         )
 }
 
-pub fn execute(context: &mut CliContext, args: &ArgMatches) -> anyhow::Result<()> {
+/// The code ran when using the command.
+pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
+    let manifest_path = args
+        .get_one::<PathBuf>("manifest-path")
+        .expect("no manifest path");
     let server_args = args
         .get_many::<String>("server-args")
         .map_or_else(Vec::new, Iterator::collect);
 
-    let path = args
-        .get_one::<PathBuf>("server-path")
-        .map(dunce::canonicalize)
-        .transpose()
-        .prefix_err("invalid server path specified")?;
+    let mut manifest = crate::util::manifest::find(manifest_path)?;
 
-    context.find_manifest(path)?;
-    let manifest = context.manifest()?;
+    let artifact = &manifest.artifact;
+    let platform = ArtifactsPlatform::default();
+    let exe = artifact.exe(manifest_path, platform);
 
-    let base_path = context
-        .paths()
-        .manifest()
-        .and_then(|p| p.parent())
-        .expect("expected manifest path");
-    let artifact = manifest.artifact();
-    let server = manifest.server();
+    let server = &mut manifest.server;
+    let data = server.ensure_data(manifest_path)?;
 
-    match args.get_one::<String>("tx-profile") {
-        Some(profile) => server.run_tx(base_path, artifact, profile, server_args)?,
-        None => server.run(base_path, artifact, server_args)?,
-    };
+    log::debug!("running server with {}", exe.display());
+    log::debug!("using data path {}", data.display());
 
-    log::info!("finished");
+    let mut command = std::process::Command::new(exe);
+    command
+        .current_dir(&data)
+        .args(server_args)
+        .spawn()?
+        .wait()?;
+
     Ok(())
 }

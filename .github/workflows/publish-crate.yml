@@ -1,9 +1,7 @@
 name: Publish Crate
 
 on:
-  push:
-    tags:
-      - '**'
+  push: [tags]
 
 jobs:
   publish:
@@ -15,8 +13,8 @@ jobs:
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
-        
-      - name: Publish crate
+
+      - name: Publish crates
         uses: katyo/publish-crates@v2
         with:
           registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}

@@ -1,0 +1,25 @@
+[package]
+name = "dxm-home"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = ""
+repository.workspace = true
+license.workspace = true
+include.workspace = true
+
+[dependencies]
+dirs = "6.0.0"
+flate2 = "1.0.35"
+fs-err.workspace = true
+log.workspace = true
+reqwest = { workspace = true, features = ["json"] }
+self-replace = "1.5.0"
+serde.workspace = true
+tar.workspace = true
+tempfile.workspace = true
+zip.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+winreg = "0.55.0"
