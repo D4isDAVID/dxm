@@ -8,12 +8,7 @@ edition = "2024"
 rust-version = "1.85"
 repository = "https://github.com/D4isDAVID/dxm"
 license = "MIT"
-include = [
-  "src",
-  "CHANGELOG.md",
-  "LICENSE",
-  "README.md"
-]
+include = ["src", "CHANGELOG.md", "LICENSE", "README.md"]
 
 [workspace.dependencies]
 dxm-artifacts = { path = "./crates/dxm-artifacts", version = "0.1.0" }
@@ -22,16 +17,16 @@ dxm-init = { path = "./crates/dxm-init", version = "0.1.0" }
 dxm-manifest = { path = "./crates/dxm-manifest", version = "0.1.0" }
 fs-err = "3.1.0"
 git2 = "0.20.1"
-log = { version = "0.4.26", features = ["std"] }
+log = { version = "0.4.27", features = ["std"] }
 reqwest = { version = "0.12.15", features = ["blocking"] }
 serde = { version = "1.0.219", features = ["derive"] }
 tar = "0.4.44"
-tempfile = "3.19.0"
-zip = { version = "2.4.1", features = ["deflate"], default-features = false }
+tempfile = "3.19.1"
+zip = { version = "2.6.1", features = ["deflate"], default-features = false }
 
 [package]
 name = "dxm"
-version = "0.1.0"
+version = "0.1.1"
 authors.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -42,8 +37,20 @@ keywords = ["fivem", "redm", "fxserver", "cfx", "citizenfx"]
 categories = ["command-line-utilities"]
 include.workspace = true
 
+[profile.dev]
+opt-level = 0
+overflow-checks = false
+
+[profile.release]
+codegen-units = 1
+lto = "fat"
+overflow-checks = true
+opt-level = "s"
+panic = "abort"
+strip = "symbols"
+
 [dependencies]
-clap = { version = "4.5.32", features = ["cargo", "env"] }
+clap = { version = "4.5.36", features = ["cargo", "env"] }
 dxm-artifacts.workspace = true
 dxm-home.workspace = true
 dxm-init.workspace = true
