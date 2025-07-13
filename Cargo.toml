@@ -31,7 +31,7 @@ zip = { version = "2.4.1", features = ["deflate"], default-features = false }
 
 [package]
 name = "dxm"
-version = "0.1.0"
+version = "0.1.1"
 authors.workspace = true
 edition.workspace = true
 rust-version.workspace = true

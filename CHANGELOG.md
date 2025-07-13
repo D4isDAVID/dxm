@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [unreleased diff]
 
+## [0.1.1] - 2025-07-14
+
+[0.1.1 diff]
+
 ### Fixed
 
 - `dxm run` sometimes not finding the FXServer executable.
@@ -19,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release.
 
-[unreleased diff]: https://github.com/D4isDAVID/dxm/compare/v0.1.0...main
+[unreleased diff]: https://github.com/D4isDAVID/dxm/compare/v0.1.1...main
+[0.1.1]: https://github.com/D4isDAVID/dxm/releases/tag/v0.1.1
+[0.1.1 diff]: https://github.com/D4isDAVID/dxm/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/D4isDAVID/dxm/releases/tag/v0.1.0
 [0.1.0 commits]: https://github.com/D4isDAVID/dxm/commits/v0.1.0
