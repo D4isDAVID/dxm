@@ -37,7 +37,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
 
     let artifact = &manifest.artifact;
     let platform = ArtifactsPlatform::default();
-    let exe = artifact.exe(manifest_path, platform);
+    let exe = artifact.exe(manifest_path, platform).canonicalize()?;
 
     let server = &mut manifest.server;
     let data = server.ensure_data(manifest_path)?;

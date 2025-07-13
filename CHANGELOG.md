@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [unreleased diff]
 
+### Fixed
+
+- `dxm run` sometimes not finding the FXServer executable.
+
 ## [0.1.0] - 2025-03-19
 
 [0.1.0 commits]
