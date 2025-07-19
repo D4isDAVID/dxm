@@ -20,14 +20,14 @@ dxm-artifacts = { path = "./crates/dxm-artifacts", version = "0.1.0" }
 dxm-home = { path = "./crates/dxm-home", version = "0.1.0" }
 dxm-init = { path = "./crates/dxm-init", version = "0.1.0" }
 dxm-manifest = { path = "./crates/dxm-manifest", version = "0.1.0" }
-fs-err = "3.1.0"
-git2 = "0.20.1"
-log = { version = "0.4.26", features = ["std"] }
-reqwest = { version = "0.12.15", features = ["blocking"] }
+fs-err = "3.1.1"
+git2 = "0.20.2"
+log = { version = "0.4.27", features = ["std"] }
+reqwest = { version = "0.12.22", features = ["blocking"] }
 serde = { version = "1.0.219", features = ["derive"] }
 tar = "0.4.44"
-tempfile = "3.19.0"
-zip = { version = "2.4.1", features = ["deflate"], default-features = false }
+tempfile = "3.20.0"
+zip = { version = "4.3.0", features = ["deflate"], default-features = false }
 
 [package]
 name = "dxm"
@@ -43,7 +43,7 @@ categories = ["command-line-utilities"]
 include.workspace = true
 
 [dependencies]
-clap = { version = "4.5.32", features = ["cargo", "env"] }
+clap = { version = "4.5.41", features = ["cargo", "env"] }
 dxm-artifacts.workspace = true
 dxm-home.workspace = true
 dxm-init.workspace = true
