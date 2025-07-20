@@ -42,10 +42,12 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
 
     let mut version = if let Some(version) = version_arg {
         version.clone()
-    } else if !artifact.version.is_empty() {
-        artifact.version.clone()
     } else {
-        artifact.channel.to_string()
+        artifact.version().to_owned()
+    };
+
+    if version.is_empty() {
+        version = artifact.channel().to_string()
     };
 
     let client = crate::util::reqwest::github_client().build()?;
@@ -66,7 +68,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
 
     let path = path.unwrap_or_else(|| artifact.path(manifest_path));
     artifact.set_path(manifest_path, &path)?;
-    artifact.version = version.clone();
+    artifact.set_version(version.clone());
 
     manifest.write(manifest_path)?;
 

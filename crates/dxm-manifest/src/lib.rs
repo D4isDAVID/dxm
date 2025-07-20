@@ -4,6 +4,8 @@ use std::{error::Error, path::Path};
 
 use serde::{Deserialize, Serialize};
 
+use crate::util::add_and_fill_missing_table;
+
 pub mod artifact;
 pub mod server;
 mod util;
@@ -37,7 +39,7 @@ impl Manifest {
         P: AsRef<Path>,
     {
         let mut dir = dir.as_ref();
-        let mut path = dir.join(MANIFEST_NAME);
+        let mut path = Self::dir_manifest(dir);
 
         while !path.try_exists()? {
             if let Some(parent_dir) = dir.parent() {
@@ -46,7 +48,7 @@ impl Manifest {
                 return Ok(None);
             }
 
-            path = dir.join(MANIFEST_NAME);
+            path = Self::dir_manifest(dir);
         }
 
         log::debug!("found manifest in {}", dir.display());
@@ -61,14 +63,12 @@ impl Manifest {
     where
         P: AsRef<Path>,
     {
-        let dir = dir.as_ref();
-
-        let path = dir.join(MANIFEST_NAME);
+        let path = Self::dir_manifest(dir);
 
         log::debug!("reading manifest path {}", path.display());
 
         let contents = fs_err::read_to_string(path)?;
-        let manifest = toml::from_str(&contents)?;
+        let manifest = toml_edit::de::from_str(&contents)?;
 
         Ok(manifest)
     }
@@ -78,15 +78,34 @@ impl Manifest {
     where
         P: AsRef<Path>,
     {
-        let dir = dir.as_ref();
+        let path = Self::dir_manifest(dir);
 
-        let path = dir.join(MANIFEST_NAME);
+        log::debug!("parsing manifest path {}", path.display());
+
+        let content = fs_err::read_to_string(&path)?;
+        let mut document: toml_edit::DocumentMut = content.parse()?;
 
         log::debug!("writing manifest path {}", path.display());
 
-        let contents = toml::to_string_pretty(self)?;
-        fs_err::write(path, contents)?;
+        self.fill_document(&mut document);
+        fs_err::write(path, document.to_string())?;
 
         Ok(())
+    }
+
+    /// Fills out the manifest inside the given TOML document.
+    fn fill_document(&self, document: &mut toml_edit::DocumentMut) {
+        add_and_fill_missing_table(document, "artifact", |i| self.artifact.fill_toml_item(i));
+        add_and_fill_missing_table(document, "server", |i| self.server.fill_toml_item(i));
+    }
+
+    /// Returns the given directory's path joined with the manifest file name.
+    fn dir_manifest<P>(dir: P) -> PathBuf
+    where
+        P: AsRef<Path>,
+    {
+        let dir = dir.as_ref();
+
+        dir.join(MANIFEST_NAME)
     }
 }

@@ -14,18 +14,19 @@ where
 
     log::info!("getting versions");
 
-    let version = if artifact.channel == ArtifactsChannel::LatestJg {
+    let channel = artifact.channel();
+    let version = if channel == ArtifactsChannel::LatestJg {
         dxm_artifacts::jg::artifacts(&client)?.version().to_owned()
     } else {
         dxm_artifacts::cfx::versions(&client, &platform)?
-            .version(&artifact.channel)
+            .version(&channel)
             .to_owned()
     };
 
     log::info!("installing artifact {}", &version);
     dxm_artifacts::install(&client, &platform, &version, artifact.path(&path))?;
 
-    artifact.version = version;
+    artifact.set_version(version);
     manifest.write(path)?;
 
     log::info!("successfully updated artifact");
