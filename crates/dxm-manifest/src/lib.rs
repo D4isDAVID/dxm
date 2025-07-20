@@ -1,6 +1,9 @@
 //! A crate that contains manifest structures used by dxm.
 
-use std::{error::Error, path::Path};
+use std::{
+    error::Error,
+    path::{Path, PathBuf},
+};
 
 use serde::{Deserialize, Serialize};
 
@@ -30,21 +33,28 @@ impl Manifest {
         Self { artifact, server }
     }
 
-    /// Attempts to find a `dxm.toml` file in the given directory,searching
+    /// Attempts to find a `dxm.toml` file in the given directory, searching
     /// through parent directories as well.
     ///
-    /// Returns a new `Manifest` instance if found, or `None` if not.
-    pub fn find<P>(dir: P) -> Result<Option<Self>, Box<dyn Error>>
+    /// Returns the manifest's directory if found, or `None` if not.
+    pub fn find<P>(dir: P) -> Result<Option<PathBuf>, Box<dyn Error>>
     where
         P: AsRef<Path>,
     {
-        let mut dir = dir.as_ref();
+        let full_dir = fs_err::canonicalize(dir.as_ref())?;
+
+        let mut dir = full_dir.as_path();
         let mut path = Self::dir_manifest(dir);
 
         while !path.try_exists()? {
             if let Some(parent_dir) = dir.parent() {
                 dir = parent_dir;
             } else {
+                log::debug!(
+                    "could not find manifest in {} or its parents",
+                    full_dir.display()
+                );
+
                 return Ok(None);
             }
 
@@ -52,9 +62,8 @@ impl Manifest {
         }
 
         log::debug!("found manifest in {}", dir.display());
-        let manifest = Self::read(dir)?;
 
-        Ok(Some(manifest))
+        Ok(Some(dir.to_path_buf()))
     }
 
     /// Reads a `dxm.toml` file in the given directory, and returns a new
@@ -80,10 +89,21 @@ impl Manifest {
     {
         let path = Self::dir_manifest(dir);
 
-        log::debug!("parsing manifest path {}", path.display());
+        let mut document = match fs_err::read_to_string(&path) {
+            Ok(content) => {
+                log::debug!("parsing manifest path {}", path.display());
 
-        let content = fs_err::read_to_string(&path)?;
-        let mut document: toml_edit::DocumentMut = content.parse()?;
+                content.parse()?
+            }
+            Err(err) => match err.kind() {
+                std::io::ErrorKind::NotFound => {
+                    log::trace!("creating new manifest file");
+
+                    toml_edit::DocumentMut::new()
+                }
+                _ => Err(err)?,
+            },
+        };
 
         log::debug!("writing manifest path {}", path.display());
 
