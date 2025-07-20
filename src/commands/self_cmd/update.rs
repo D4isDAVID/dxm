@@ -29,7 +29,7 @@ pub fn execute(_args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         return Ok(());
     }
 
-    log::info!("updating dxm to {}", tag_name);
+    log::info!("updating dxm to {tag_name}");
     home.update(&client, &release, &platform)?;
 
     log::info!("successfully updated dxm");

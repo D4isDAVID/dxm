@@ -34,7 +34,7 @@ impl UpdatePlatform {
             Self::Linux => "linux-x64.tar.gz",
         };
 
-        format!("dxm-{}-{}", tag_name, suffix)
+        format!("dxm-{tag_name}-{suffix}")
     }
 
     /// Returns the update binary name for the platform, appended to the given

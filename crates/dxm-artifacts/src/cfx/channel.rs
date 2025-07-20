@@ -55,7 +55,7 @@ impl Display for ArtifactsChannel {
             ArtifactsChannel::LatestJg => "latest-jg",
         };
 
-        write!(f, "{}", str)?;
+        write!(f, "{str}")?;
 
         Ok(())
     }

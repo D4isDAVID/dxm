@@ -29,7 +29,7 @@ impl Release {
     pub fn archive_url(&self, platform: &UpdatePlatform) -> Option<&str> {
         let archive_name = platform.archive_name(&self.tag_name);
 
-        log::debug!("finding update archive url: {}", archive_name);
+        log::debug!("finding update archive url: {archive_name}");
         for asset in &self.assets {
             if asset.name == archive_name {
                 return Some(&asset.browser_download_url);
