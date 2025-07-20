@@ -27,7 +27,7 @@ where
     dxm_artifacts::install(&client, &platform, &version, artifact.path(&path))?;
 
     artifact.set_version(version);
-    manifest.write(path)?;
+    manifest.write_artifact(path)?;
 
     log::info!("successfully updated artifact");
 

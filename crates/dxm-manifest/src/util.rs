@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf, StripPrefixError};
 
-use toml_edit::{DocumentMut, Item};
+use toml_edit::Item;
 
 /// Strips the given base from the given path to create a relative path.
 ///
@@ -17,15 +17,15 @@ where
 /// Uses the given function to fill out information inside the document table
 /// with the given key. If a table with the given key does not exist, creates it
 /// first.
-pub fn add_and_fill_missing_table<S>(document: &mut DocumentMut, key: S, fill: impl Fn(&mut Item))
+pub fn add_and_fill_missing_table<S>(item: &mut Item, key: S, fill: impl Fn(&mut Item))
 where
     S: AsRef<str>,
 {
     let key = key.as_ref();
 
-    if !document.contains_key(key) {
-        document[key] = toml_edit::table();
+    if item[key].is_none() {
+        item[key] = toml_edit::table();
     }
 
-    fill(&mut document[key]);
+    fill(&mut item[key]);
 }

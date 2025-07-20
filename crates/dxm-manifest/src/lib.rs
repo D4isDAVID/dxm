@@ -6,6 +6,7 @@ use std::{
 };
 
 use serde::{Deserialize, Serialize};
+use toml_edit::{DocumentMut, Item};
 
 use crate::util::add_and_fill_missing_table;
 
@@ -82,8 +83,42 @@ impl Manifest {
         Ok(manifest)
     }
 
-    /// Writes a `dxm.toml` file in the given directory.
+    /// Updates and writes a `dxm.toml` file in the given directory.
     pub fn write<P>(&self, dir: P) -> Result<(), Box<dyn Error>>
+    where
+        P: AsRef<Path>,
+    {
+        self.fill_and_write(dir, |item| {
+            add_and_fill_missing_table(item, "artifact", |i| self.artifact.fill_toml_item(i));
+            add_and_fill_missing_table(item, "server", |i| self.server.fill_toml_item(i));
+        })
+    }
+
+    /// Updates the artifact table and writes a `dxm.toml` file in the given
+    /// directory.
+    pub fn write_artifact<P>(&self, dir: P) -> Result<(), Box<dyn Error>>
+    where
+        P: AsRef<Path>,
+    {
+        self.fill_and_write(dir, |item| {
+            add_and_fill_missing_table(item, "artifact", |i| self.artifact.fill_toml_item(i));
+        })
+    }
+
+    /// Updates the server table and writes a `dxm.toml` file in the given
+    /// directory.
+    pub fn write_server<P>(&self, dir: P) -> Result<(), Box<dyn Error>>
+    where
+        P: AsRef<Path>,
+    {
+        self.fill_and_write(dir, |item| {
+            add_and_fill_missing_table(item, "server", |i| self.server.fill_toml_item(i));
+        })
+    }
+
+    /// Reads a `dxm.toml` file in the given directory, runs the given function
+    /// on it, and writes the document back.
+    fn fill_and_write<P>(&self, dir: P, fill: impl Fn(&mut Item)) -> Result<(), Box<dyn Error>>
     where
         P: AsRef<Path>,
     {
@@ -99,7 +134,7 @@ impl Manifest {
                 std::io::ErrorKind::NotFound => {
                     log::trace!("creating new manifest file");
 
-                    toml_edit::DocumentMut::new()
+                    DocumentMut::new()
                 }
                 _ => Err(err)?,
             },
@@ -107,16 +142,10 @@ impl Manifest {
 
         log::debug!("writing manifest path {}", path.display());
 
-        self.fill_document(&mut document);
+        fill(document.as_item_mut());
         fs_err::write(path, document.to_string())?;
 
         Ok(())
-    }
-
-    /// Fills out the manifest inside the given TOML document.
-    fn fill_document(&self, document: &mut toml_edit::DocumentMut) {
-        add_and_fill_missing_table(document, "artifact", |i| self.artifact.fill_toml_item(i));
-        add_and_fill_missing_table(document, "server", |i| self.server.fill_toml_item(i));
     }
 
     /// Returns the given directory's path joined with the manifest file name.

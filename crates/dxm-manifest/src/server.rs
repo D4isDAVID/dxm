@@ -67,7 +67,7 @@ impl Server {
     }
 
     /// Fills out information about the server inside the given TOML document.
-    pub fn fill_toml_item(&self, document: &mut toml_edit::Item) {
-        document["data"] = toml_edit::value(self.relative_data().to_string_lossy().into_owned());
+    pub fn fill_toml_item(&self, item: &mut toml_edit::Item) {
+        item["data"] = toml_edit::value(self.relative_data().to_string_lossy().into_owned());
     }
 }

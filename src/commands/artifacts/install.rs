@@ -70,10 +70,10 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     artifact.set_path(&manifest_path, &path)?;
     artifact.set_version(version.clone());
 
-    manifest.write(manifest_path)?;
-
     log::info!("installing artifact {}", &version);
+
     dxm_artifacts::install(&client, &platform, &version, path)?;
+    manifest.write_artifact(manifest_path)?;
 
     log::info!("successfully installed artifact");
 

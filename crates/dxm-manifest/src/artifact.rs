@@ -92,9 +92,9 @@ impl Artifact {
     }
 
     /// Fills out information about the installation inside the given TOML document.
-    pub fn fill_toml_item(&self, document: &mut toml_edit::Item) {
-        document["path"] = toml_edit::value(self.relative_path().to_string_lossy().into_owned());
-        document["version"] = toml_edit::value(self.version());
-        document["channel"] = toml_edit::value(self.channel().to_string());
+    pub fn fill_toml_item(&self, item: &mut toml_edit::Item) {
+        item["path"] = toml_edit::value(self.relative_path().to_string_lossy().into_owned());
+        item["version"] = toml_edit::value(self.version());
+        item["channel"] = toml_edit::value(self.channel().to_string());
     }
 }
