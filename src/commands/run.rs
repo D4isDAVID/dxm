@@ -33,11 +33,11 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         .get_many::<String>("server-args")
         .map_or_else(Vec::new, Iterator::collect);
 
-    let mut manifest = crate::util::manifest::find(manifest_path)?;
+    let (manifest_path, mut manifest) = crate::util::manifest::find(manifest_path)?;
 
     let artifact = &manifest.artifact;
     let platform = ArtifactsPlatform::default();
-    let exe = artifact.exe(manifest_path, platform).canonicalize()?;
+    let exe = artifact.exe(&manifest_path, platform).canonicalize()?;
 
     let server = &mut manifest.server;
     let data = server.ensure_data(manifest_path)?;

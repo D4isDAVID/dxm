@@ -23,7 +23,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         .get_one::<PathBuf>("manifest-path")
         .expect("no manifest path");
 
-    let mut manifest = crate::util::manifest::find(manifest_path)?;
+    let (manifest_path, mut manifest) = crate::util::manifest::find(manifest_path)?;
 
     crate::util::artifacts::update(manifest_path, &mut manifest)?;
 

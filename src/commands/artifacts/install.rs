@@ -37,7 +37,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         .expect("no manifest path");
     let path = args.get_one::<String>("path").map(PathBuf::from);
 
-    let mut manifest = crate::util::manifest::find(manifest_path)?;
+    let (manifest_path, mut manifest) = crate::util::manifest::find(manifest_path)?;
     let artifact = &mut manifest.artifact;
 
     let mut version = if let Some(version) = version_arg {
@@ -66,8 +66,8 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         }
     }
 
-    let path = path.unwrap_or_else(|| artifact.path(manifest_path));
-    artifact.set_path(manifest_path, &path)?;
+    let path = path.unwrap_or_else(|| artifact.path(&manifest_path));
+    artifact.set_path(&manifest_path, &path)?;
     artifact.set_version(version.clone());
 
     manifest.write(manifest_path)?;

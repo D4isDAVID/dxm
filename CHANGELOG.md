@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [unreleased diff]
 
+### Fixed
+
+- Writing manifest file when using commands outside the manifest's directory.
+
 ## [0.1.1] - 2025-07-14
 
 [0.1.1 diff]
