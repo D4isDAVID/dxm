@@ -247,7 +247,7 @@ dependencies = [
 
 [[package]]
 name = "dxm"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "clap",
  "dxm-artifacts",
@@ -261,7 +261,7 @@ dependencies = [
 
 [[package]]
 name = "dxm-artifacts"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "fs-err",
  "log",
@@ -276,7 +276,7 @@ dependencies = [
 
 [[package]]
 name = "dxm-home"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "dirs",
  "flate2",
@@ -293,7 +293,7 @@ dependencies = [
 
 [[package]]
 name = "dxm-init"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "dxm-manifest",
  "fs-err",
@@ -304,7 +304,7 @@ dependencies = [
 
 [[package]]
 name = "dxm-manifest"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "dxm-artifacts",
  "fs-err",
@@ -1102,9 +1102,9 @@ checksum = "69cdb34c158ceb288df11e18b4bd39de994f6657d83847bdffdbd7f346754b0f"
 
 [[package]]
 name = "redox_syscall"
-version = "0.5.13"
+version = "0.5.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0d04b7d0ee6b4a0207a0a7adb104d23ecb0b47d6beae7152d0fa34b692b29fd6"
+checksum = "de3a5d9f0aba1dbcec1cc47f0ff94a4b778fe55bca98a6dfa92e4e094e57b1c4"
 dependencies = [
  "bitflags",
 ]
