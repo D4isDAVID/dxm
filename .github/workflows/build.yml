@@ -14,7 +14,7 @@ jobs:
 
           - type: linux-x64
             os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
+            target: x86_64-unknown-linux-musl
 
     name: Build (${{ matrix.type }})
     runs-on: ${{ matrix.os }}
