@@ -1,8 +1,41 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+
+permissions:
+  contents: read
 
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Lint
+        run: cargo clippy --verbose --locked --workspace --all-targets
+
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Format
+        run: cargo fmt --verbose --check --all
+
   test:
     strategy:
       fail-fast: false
@@ -11,51 +44,20 @@ jobs:
           - type: windows-x64
             os: windows-latest
             target: x86_64-pc-windows-msvc
-
           - type: linux-x64
             os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
 
     name: Test (${{ matrix.type }})
     runs-on: ${{ matrix.os }}
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Setup Rust toolchain
+      - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
 
-      - name: Build
-        run: cargo build --verbose --locked
-
       - name: Test
-        run: cargo test --verbose --locked
-
-  format:
-    name: Check formatting
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Check formatting
-        run: cargo fmt --verbose --check
-
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Lint
-        run: cargo clippy
+        run: cargo test --verbose --locked --workspace
