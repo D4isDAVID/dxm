@@ -5,7 +5,7 @@ on:
   pull_request:
 
 permissions:
-  content: read
+  contents: read
 
 jobs:
   artifact:
@@ -61,7 +61,7 @@ jobs:
     name: Draft Release
     runs-on: ubuntu-latest
     permissions:
-      content: write
+      contents: write
     needs: build
     if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
     steps:
