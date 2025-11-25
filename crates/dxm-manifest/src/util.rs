@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf, StripPrefixError};
 
-use toml_edit::Item;
+use toml_edit::{InlineTable, Item, Value};
 
 /// Strips the given base from the given path to create a relative path.
 ///
@@ -25,6 +25,22 @@ where
 
     if item.get(key).is_none() {
         item[key] = toml_edit::table();
+    }
+
+    fill(&mut item[key]);
+}
+
+/// Uses the given function to fill out information inside the document table
+/// with the given key. If a table with the given key does not exist, creates it
+/// first.
+pub fn add_and_fill_inline_table<S>(item: &mut Item, key: S, fill: impl Fn(&mut Item))
+where
+    S: AsRef<str>,
+{
+    let key = key.as_ref();
+
+    if item.get(key).is_none() {
+        item[key] = Item::Value(Value::InlineTable(InlineTable::new()));
     }
 
     fill(&mut item[key]);

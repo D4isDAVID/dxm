@@ -231,6 +231,7 @@ dependencies = [
  "dxm-home",
  "dxm-init",
  "dxm-manifest",
+ "dxm-resources",
  "fern",
  "log",
  "reqwest",
@@ -288,6 +289,17 @@ dependencies = [
  "log",
  "serde",
  "toml_edit",
+]
+
+[[package]]
+name = "dxm-resources"
+version = "0.1.0"
+dependencies = [
+ "fs-err",
+ "log",
+ "reqwest",
+ "tempfile",
+ "zip",
 ]
 
 [[package]]

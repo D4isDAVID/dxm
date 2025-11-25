@@ -22,6 +22,7 @@ dxm-artifacts = { path = "./crates/dxm-artifacts", version = "0.1.1" }
 dxm-home = { path = "./crates/dxm-home", version = "0.1.1" }
 dxm-init = { path = "./crates/dxm-init", version = "0.1.1" }
 dxm-manifest = { path = "./crates/dxm-manifest", version = "0.1.1" }
+dxm-resources = { path = "./crates/dxm-resources", version = "0.1.0" }
 fern = "0.7.1"
 flate2 = "1.1.5"
 fs-err = "3.2.0"
@@ -56,6 +57,7 @@ dxm-artifacts.workspace = true
 dxm-home.workspace = true
 dxm-init.workspace = true
 dxm-manifest.workspace = true
+dxm-resources.workspace = true
 log.workspace = true
 reqwest.workspace = true
 fern.workspace = true

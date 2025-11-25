@@ -5,6 +5,7 @@ use std::error::Error;
 use clap::{Arg, ArgAction, ArgMatches, Command};
 use log::LevelFilter;
 
+pub mod add;
 pub mod artifacts;
 pub mod init;
 pub mod new;
@@ -59,6 +60,7 @@ pub fn cli() -> Command {
                 .action(ArgAction::SetTrue)
                 .global(true),
         )
+        .subcommand(add::cli())
         .subcommand(artifacts::cli())
         .subcommand(init::cli())
         .subcommand(new::cli())
@@ -73,6 +75,7 @@ pub fn execute(args: &ArgMatches, options: &ExecuteOptions) -> Result<(), Box<dy
     log::set_max_level(determine_log_level(args, options));
 
     match args.subcommand() {
+        Some(("add", m)) => add::execute(m)?,
         Some(("artifacts", m)) => artifacts::execute(m)?,
         Some(("init", m)) => init::execute(m)?,
         Some(("new", m)) => new::execute(m)?,

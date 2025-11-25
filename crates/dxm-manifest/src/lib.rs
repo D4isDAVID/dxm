@@ -1,6 +1,7 @@
 //! A crate that contains manifest structures used by dxm.
 
 use std::{
+    collections::HashMap,
     error::Error,
     path::{Path, PathBuf},
 };
@@ -8,9 +9,10 @@ use std::{
 use serde::{Deserialize, Serialize};
 use toml_edit::{DocumentMut, Item};
 
-use crate::util::add_and_fill_missing_table;
+use crate::util::{add_and_fill_inline_table, add_and_fill_missing_table};
 
 pub mod artifact;
+pub mod resource;
 pub mod server;
 mod util;
 
@@ -26,12 +28,24 @@ pub struct Manifest {
     /// The data about the server.
     #[serde(default)]
     pub server: server::Server,
+
+    /// The data about the third-party resources.
+    #[serde(default)]
+    pub resources: HashMap<String, resource::Resource>,
 }
 
 impl Manifest {
     /// Constructs and returns a new `Manifest` instance.
-    pub fn new(artifact: artifact::Artifact, server: server::Server) -> Self {
-        Self { artifact, server }
+    pub fn new(
+        artifact: artifact::Artifact,
+        server: server::Server,
+        resources: HashMap<String, resource::Resource>,
+    ) -> Self {
+        Self {
+            artifact,
+            server,
+            resources,
+        }
     }
 
     /// Attempts to find a `dxm.toml` file in the given directory, searching
@@ -91,6 +105,11 @@ impl Manifest {
         self.fill_and_write(dir, |item| {
             add_and_fill_missing_table(item, "artifact", |i| self.artifact.fill_toml_item(i));
             add_and_fill_missing_table(item, "server", |i| self.server.fill_toml_item(i));
+            add_and_fill_missing_table(item, "resources", |i| {
+                for (name, resource) in self.resources.iter() {
+                    add_and_fill_inline_table(i, name, |ri| resource.fill_toml_item(ri));
+                }
+            });
         })
     }
 
@@ -113,6 +132,21 @@ impl Manifest {
     {
         self.fill_and_write(dir, |item| {
             add_and_fill_missing_table(item, "server", |i| self.server.fill_toml_item(i));
+        })
+    }
+
+    /// Updates the resources table and writes a `dxm.toml` file in the given
+    /// directory.
+    pub fn write_resources<P>(&self, dir: P) -> Result<(), Box<dyn Error>>
+    where
+        P: AsRef<Path>,
+    {
+        self.fill_and_write(dir, |item| {
+            add_and_fill_missing_table(item, "resources", |i| {
+                for (name, resource) in self.resources.iter() {
+                    add_and_fill_inline_table(i, name, |ri| resource.fill_toml_item(ri));
+                }
+            });
         })
     }
 
