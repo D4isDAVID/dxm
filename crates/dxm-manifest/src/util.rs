@@ -23,7 +23,7 @@ where
 {
     let key = key.as_ref();
 
-    if item[key].is_none() {
+    if item.get(key).is_none() {
         item[key] = toml_edit::table();
     }
 
