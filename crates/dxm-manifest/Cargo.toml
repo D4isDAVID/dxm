@@ -14,4 +14,4 @@ dxm-artifacts.workspace = true
 fs-err.workspace = true
 log.workspace = true
 serde.workspace = true
-toml_edit = { version = "0.23.2", features = ["serde"] }
+toml_edit.workspace = true

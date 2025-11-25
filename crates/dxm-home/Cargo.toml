@@ -10,12 +10,12 @@ license.workspace = true
 include.workspace = true
 
 [dependencies]
-dirs = "6.0.0"
-flate2 = "1.1.2"
+dirs.workspace = true
+flate2.workspace = true
 fs-err.workspace = true
 log.workspace = true
 reqwest = { workspace = true, features = ["json"] }
-self-replace = "1.5.0"
+self-replace.workspace = true
 serde.workspace = true
 tar.workspace = true
 tempfile.workspace = true
