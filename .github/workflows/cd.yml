@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    needs: build
+    needs: artifact
     if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
     steps:
       - name: Checkout repository
