@@ -59,3 +59,8 @@ dxm-manifest.workspace = true
 log.workspace = true
 reqwest.workspace = true
 fern.workspace = true
+
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = "fat"
