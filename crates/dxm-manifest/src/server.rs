@@ -53,6 +53,16 @@ impl Server {
         manifest_path.as_ref().join(self.relative_data())
     }
 
+    /// Returns the server's resources path appended to the given manifest file path.
+    pub fn resources<P>(&self, manifest_path: P) -> PathBuf
+    where
+        P: AsRef<Path>,
+    {
+        manifest_path
+            .as_ref()
+            .join(self.relative_data().join("resources"))
+    }
+
     /// Returns the server data's path appended to the given manifest file path,
     /// and ensures that it exists by creating it if it doesn't.
     pub fn ensure_data<P>(&self, manifest_path: P) -> std::io::Result<PathBuf>

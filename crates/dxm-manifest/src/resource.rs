@@ -55,28 +55,32 @@ impl Resource {
         self.url.as_deref()
     }
 
-    /// Sets the resource's category path relative to the given server data path.
-    pub fn set_category<M, P>(&mut self, data_path: M, category: P) -> Result<(), StripPrefixError>
+    /// Sets the resource's category path relative to the given server resources path.
+    pub fn set_category<M, P>(
+        &mut self,
+        resources_path: M,
+        category: P,
+    ) -> Result<(), StripPrefixError>
     where
         M: AsRef<Path>,
         P: AsRef<Path>,
     {
-        self.category = Some(relative_path(data_path, category)?);
+        self.category = Some(relative_path(resources_path, category)?);
 
         Ok(())
     }
 
-    /// Returns the resource's category path relative to the server data path.
+    /// Returns the resource's category path relative to the server resources path.
     fn relative_category(&self) -> &PathBuf {
         self.category.as_ref().unwrap_or(&*DEFAULT_CATEGORY)
     }
 
-    /// Returns the resource's category path appended to the given server data path.
-    pub fn category<P>(&self, data_path: P) -> PathBuf
+    /// Returns the resource's category path appended to the given server resources path.
+    pub fn category<P>(&self, resources_path: P) -> PathBuf
     where
         P: AsRef<Path>,
     {
-        data_path.as_ref().join(self.relative_category())
+        resources_path.as_ref().join(self.relative_category())
     }
 
     /// Sets the resource's nested path inside its download archive.

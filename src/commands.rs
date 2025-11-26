@@ -9,6 +9,7 @@ pub mod add;
 pub mod artifacts;
 pub mod init;
 pub mod new;
+pub mod remove;
 pub mod run;
 pub mod self_cmd;
 
@@ -64,6 +65,7 @@ pub fn cli() -> Command {
         .subcommand(artifacts::cli())
         .subcommand(init::cli())
         .subcommand(new::cli())
+        .subcommand(remove::cli())
         .subcommand(run::cli())
         .subcommand(self_cmd::cli())
         .arg_required_else_help(true)
@@ -79,6 +81,7 @@ pub fn execute(args: &ArgMatches, options: &ExecuteOptions) -> Result<(), Box<dy
         Some(("artifacts", m)) => artifacts::execute(m)?,
         Some(("init", m)) => init::execute(m)?,
         Some(("new", m)) => new::execute(m)?,
+        Some(("remove", m)) => remove::execute(m)?,
         Some(("run", m)) => run::execute(m)?,
         Some(("self", m)) => self_cmd::execute(m)?,
         _ => unreachable!(),

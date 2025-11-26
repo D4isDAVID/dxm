@@ -62,8 +62,8 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
 
     let (manifest_path, mut manifest) = crate::util::manifest::find(manifest_path)?;
     let resources = &mut manifest.resources;
-    let server_data = &manifest.server.data(&manifest_path);
-    let base_path = server_data.join("resources").join(&category);
+    let server_resources = &manifest.server.resources(&manifest_path);
+    let base_path = server_resources.join(&category);
 
     let client = crate::util::reqwest::client().build()?;
     resources.insert(name.clone(), Resource::new(url, category, nested_path));

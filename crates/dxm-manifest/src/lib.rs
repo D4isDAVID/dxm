@@ -105,11 +105,7 @@ impl Manifest {
         self.fill_and_write(dir, |item| {
             add_and_fill_missing_table(item, "artifact", |i| self.artifact.fill_toml_item(i));
             add_and_fill_missing_table(item, "server", |i| self.server.fill_toml_item(i));
-            add_and_fill_missing_table(item, "resources", |i| {
-                for (name, resource) in self.resources.iter() {
-                    add_and_fill_inline_table(i, name, |ri| resource.fill_toml_item(ri));
-                }
-            });
+            self.fill_resources(item, "resources");
         })
     }
 
@@ -142,12 +138,31 @@ impl Manifest {
         P: AsRef<Path>,
     {
         self.fill_and_write(dir, |item| {
-            add_and_fill_missing_table(item, "resources", |i| {
-                for (name, resource) in self.resources.iter() {
-                    add_and_fill_inline_table(i, name, |ri| resource.fill_toml_item(ri));
-                }
-            });
+            self.fill_resources(item, "resources");
         })
+    }
+
+    fn fill_resources<S>(&self, item: &mut Item, key: S)
+    where
+        S: AsRef<str>,
+    {
+        add_and_fill_missing_table(item, key.as_ref(), |i| {
+            for (name, resource) in self.resources.iter() {
+                add_and_fill_inline_table(i, name, |ri| resource.fill_toml_item(ri));
+            }
+
+            if let Some(table) = i.as_table_mut() {
+                let keys = table
+                    .iter()
+                    .map(|(n, _)| n.to_string())
+                    .filter(|n| !self.resources.contains_key(n))
+                    .collect::<Vec<String>>();
+
+                for name in keys.clone() {
+                    table[&name] = Item::None
+                }
+            }
+        });
     }
 
     /// Reads a `dxm.toml` file in the given directory, runs the given function

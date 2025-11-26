@@ -63,3 +63,22 @@ where
 
     Ok(())
 }
+
+pub fn uninstall<P, S>(base_path: P, name: S) -> Result<(), Box<dyn Error>>
+where
+    P: AsRef<Path>,
+    S: AsRef<str>,
+{
+    let base_path = base_path.as_ref();
+    let name = name.as_ref();
+
+    let path = base_path.join(name);
+
+    if path.components().count() > base_path.components().count() + 1 {
+        Err(InvalidResourceNameError {})?;
+    }
+
+    fs_err::remove_dir_all(path)?;
+
+    Ok(())
+}
