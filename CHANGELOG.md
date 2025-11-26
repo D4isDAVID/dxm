@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [unreleased diff]
 
+### Added
+
+- `dxm add` to install resources.
+- `dxm remove` to uninstall resources.
+
+### Changed
+
+- Updated dependencies.
+- Optimized the binary file size.
+
 ## [0.1.2] - 2025-07-20
 
 [0.1.2 diff]

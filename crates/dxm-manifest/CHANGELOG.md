@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+### Fixed
+
+- TOML writing erroring for new documents.
+
+### Changed
+
+- Updated dependencies.
+- TOML categories are now written individiually instead of overwriting the entire file.
+
 ## 0.1.1 - 2025-07-20
 
 [dxm 0.1.2]
