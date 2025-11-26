@@ -13,5 +13,7 @@ include.workspace = true
 fs-err.workspace = true
 log.workspace = true
 reqwest = { workspace = true, features = ["json"] }
+serde.workspace = true
+serde_json.workspace = true
 tempfile.workspace = true
 zip.workspace = true

@@ -298,6 +298,8 @@ dependencies = [
  "fs-err",
  "log",
  "reqwest",
+ "serde",
+ "serde_json",
  "tempfile",
  "zip",
 ]

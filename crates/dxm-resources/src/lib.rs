@@ -6,6 +6,8 @@ use reqwest::blocking::Client;
 use tempfile::{NamedTempFile, TempDir};
 use zip::{ZipArchive, read::root_dir_common_filter};
 
+mod github;
+
 const ROOT_GITIGNORE: &str = "\
 *
 ";
@@ -47,6 +49,8 @@ where
     if path.components().count() > base_path.components().count() + 1 {
         Err(InvalidResourceNameError {})?;
     }
+
+    let url = github::resolve_download_url(client, url)?;
 
     fs_err::create_dir_all(&path)?;
 
