@@ -59,7 +59,7 @@ where
     let bytes = client.get(&url).send()?.bytes()?;
     file.write_all(&bytes)?;
 
-    log::trace!("extracting archive for {}", name);
+    log::debug!("extracting {} into {}", name, nested_path.display());
     let dir = TempDir::with_suffix(name)?;
     ZipArchive::new(file.reopen()?)?.extract_unwrapped_root_dir(&dir, root_dir_common_filter)?;
 

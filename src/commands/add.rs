@@ -38,9 +38,7 @@ pub fn cli() -> Command {
             Arg::new("nested-path")
                 .help("The path to the resource inside the download archive")
                 .long("nested-path")
-                .short('n')
-                .value_parser(clap::value_parser!(PathBuf))
-                .default_value("."),
+                .short('n'),
         )
 }
 
@@ -55,10 +53,12 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         .get_one::<String>("category")
         .filter(|c| !c.contains('.'))
         .map(PathBuf::from)
-        .unwrap_or(PathBuf::from("."));
+        .unwrap_or(PathBuf::from(""));
     let nested_path = args
-        .get_one::<PathBuf>("nested-path")
-        .expect("no nested path");
+        .get_one::<String>("nested-path")
+        .filter(|n| !n.contains('.'))
+        .map(PathBuf::from)
+        .unwrap_or(PathBuf::from(""));
 
     let (manifest_path, mut manifest) = crate::util::manifest::find(manifest_path)?;
     let resources = &mut manifest.resources;
@@ -66,7 +66,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let base_path = server_resources.join(&category);
 
     let client = crate::util::reqwest::client().build()?;
-    resources.insert(name.clone(), Resource::new(url, category, nested_path));
+    resources.insert(name.clone(), Resource::new(url, category, &nested_path));
 
     log::info!("installing resource {}", &name);
 
