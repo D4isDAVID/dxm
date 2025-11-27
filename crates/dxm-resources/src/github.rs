@@ -75,6 +75,7 @@ where
         let repo_name = parts
             .get(1)
             .ok_or_else(|| InvalidGithubUrlError::new(InvalidGithubUrlErrorKind::NoName))?;
+        let repo_name = repo_name.strip_suffix(".git").unwrap_or(repo_name);
         let repo = format!("{}/{}", repo_author, repo_name);
 
         let link_type = parts.get(2).unwrap_or(&"");
