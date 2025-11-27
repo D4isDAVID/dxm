@@ -18,8 +18,8 @@ const LOCKFILE_COMMENT: &str = "\
 /// The lockfile structure containing version-locking data used by dxm.
 #[derive(Default, Serialize, Deserialize)]
 pub struct Lockfile {
-    /// The download URL for the FXServer build.
-    artifact_url: Option<String>,
+    /// The version of the FXServer installation.
+    artifact_version: Option<String>,
 
     /// The download URLs for the third-party FXServer resources.
     #[serde(default)]
@@ -28,22 +28,22 @@ pub struct Lockfile {
 
 impl Lockfile {
     /// Constructs and returns a new `Lockfile` instance.
-    pub fn new(artifact_url: String, resource_urls: HashMap<String, String>) -> Self {
+    pub fn new(artifact_version: String, resource_urls: HashMap<String, String>) -> Self {
         Self {
-            artifact_url: Some(artifact_url),
+            artifact_version: Some(artifact_version),
             resource_urls,
         }
     }
 
-    pub fn artifact_url(&self) -> Option<&str> {
-        self.artifact_url.as_deref()
+    pub fn artifact_version(&self) -> Option<&str> {
+        self.artifact_version.as_deref()
     }
 
-    pub fn set_artifact_url<S>(&mut self, artifact_url: S)
+    pub fn set_artifact_version<S>(&mut self, artifact_version: S)
     where
         S: Into<String>,
     {
-        self.artifact_url = Some(artifact_url.into());
+        self.artifact_version = Some(artifact_version.into());
     }
 
     pub fn resource_urls(&self) -> &HashMap<String, String> {
@@ -100,16 +100,16 @@ impl Lockfile {
         Ok(())
     }
 
-    pub fn write_artifact_url<P, S>(dir: P, artifact_url: S) -> Result<(), Box<dyn Error>>
+    pub fn write_artifact_version<P, S>(dir: P, artifact_version: S) -> Result<(), Box<dyn Error>>
     where
         P: AsRef<Path>,
         S: AsRef<str>,
     {
         let dir = dir.as_ref();
-        let artifact_url = artifact_url.as_ref();
+        let artifact_version = artifact_version.as_ref();
 
         let mut doc = Self::read(dir)?;
-        doc.set_artifact_url(artifact_url);
+        doc.set_artifact_version(artifact_version);
         doc.write(dir)
     }
 

@@ -11,8 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Breaking:** updated `install` and `download` functions to return the
-  installation download URL.
 - Updated dependencies.
 
 ## 0.1.1 - 2025-07-20

@@ -68,9 +68,9 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
 
     log::info!("installing artifact {}", &version);
 
-    let artifact_url = dxm_artifacts::install(&client, &platform, &version, path)?;
+    dxm_artifacts::install(&client, &platform, &version, path)?;
     manifest.write_artifact(&manifest_path)?;
-    Lockfile::write_artifact_url(manifest_path, artifact_url)?;
+    Lockfile::write_artifact_version(manifest_path, version)?;
 
     log::info!("successfully installed artifact");
 

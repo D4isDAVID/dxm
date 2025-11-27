@@ -24,10 +24,9 @@ where
         };
 
         log::info!("installing artifact {}", &version);
-        let artifact_url =
-            dxm_artifacts::install(&client, &platform, &version, artifact.path(&path))?;
+        dxm_artifacts::install(&client, &platform, &version, artifact.path(&path))?;
 
-        Lockfile::write_artifact_url(path, artifact_url)?;
+        Lockfile::write_artifact_version(path, version)?;
 
         log::info!("successfully updated artifact");
     } else {
