@@ -65,6 +65,12 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let server_resources = &manifest.server.resources(&manifest_path);
     let base_path = server_resources.join(&category);
 
+    if resources.contains_key(name) {
+        log::error!("resource {} already exists in this server", name);
+
+        return Ok(());
+    }
+
     let client = crate::util::reqwest::client().build()?;
     resources.insert(name.clone(), Resource::new(url, category, &nested_path));
 
