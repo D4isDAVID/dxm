@@ -46,8 +46,13 @@ impl Lockfile {
         self.artifact_version = Some(artifact_version.into());
     }
 
-    pub fn resource_urls(&self) -> &HashMap<String, String> {
-        &self.resource_urls
+    pub fn get_resource_url<S>(&self, resource_name: S) -> Option<&str>
+    where
+        S: AsRef<str>,
+    {
+        self.resource_urls
+            .get(resource_name.as_ref())
+            .map(|s| s.as_str())
     }
 
     pub fn set_resource_url<N, S>(&mut self, resource_name: N, resource_url: S)

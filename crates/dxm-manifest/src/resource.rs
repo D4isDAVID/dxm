@@ -9,8 +9,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::util::relative_path;
 
-static DEFAULT_CATEGORY: LazyLock<PathBuf> = LazyLock::new(|| PathBuf::from("."));
-static DEFAULT_NESTED_PATH: LazyLock<PathBuf> = LazyLock::new(|| PathBuf::from("."));
+static DEFAULT_CATEGORY: LazyLock<PathBuf> = LazyLock::new(|| PathBuf::from(""));
+static DEFAULT_NESTED_PATH: LazyLock<PathBuf> = LazyLock::new(|| PathBuf::from(""));
 
 /// Represents dxm-managed resource data.
 #[derive(Serialize, Deserialize)]

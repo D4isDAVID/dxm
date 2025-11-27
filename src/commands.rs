@@ -8,6 +8,7 @@ use log::LevelFilter;
 pub mod add;
 pub mod artifacts;
 pub mod init;
+pub mod install;
 pub mod new;
 pub mod remove;
 pub mod run;
@@ -64,6 +65,7 @@ pub fn cli() -> Command {
         .subcommand(add::cli())
         .subcommand(artifacts::cli())
         .subcommand(init::cli())
+        .subcommand(install::cli())
         .subcommand(new::cli())
         .subcommand(remove::cli())
         .subcommand(run::cli())
@@ -80,6 +82,7 @@ pub fn execute(args: &ArgMatches, options: &ExecuteOptions) -> Result<(), Box<dy
         Some(("add", m)) => add::execute(m)?,
         Some(("artifacts", m)) => artifacts::execute(m)?,
         Some(("init", m)) => init::execute(m)?,
+        Some(("install", m)) => install::execute(m)?,
         Some(("new", m)) => new::execute(m)?,
         Some(("remove", m)) => remove::execute(m)?,
         Some(("run", m)) => run::execute(m)?,

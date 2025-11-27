@@ -30,7 +30,14 @@ where
 
         log::info!("successfully updated artifact");
     } else {
-        log::error!("version in manifest is set to a static version");
+        let version = artifact.version();
+
+        log::info!("installing artifact {}", &version);
+        dxm_artifacts::install(&client, &platform, &version, artifact.path(&path))?;
+
+        Lockfile::write_artifact_version(path, version)?;
+
+        log::info!("successfully updated artifact");
     }
 
     Ok(())
