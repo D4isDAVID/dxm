@@ -28,8 +28,8 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
 
     dxm_init::server(&path, vcs)?;
 
-    let (path, mut manifest) = crate::util::manifest::find(path)?;
-    crate::util::artifacts::update(path, &mut manifest)?;
+    let (path, manifest) = crate::util::manifest::find(path)?;
+    crate::util::artifacts::update(path, &manifest)?;
 
     Ok(())
 }

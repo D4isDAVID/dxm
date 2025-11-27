@@ -1,9 +1,10 @@
 //! Contains the command to install FXServer.
 
-use std::{error::Error, path::PathBuf, str::FromStr};
+use std::{error::Error, path::PathBuf};
 
 use clap::{Arg, ArgMatches, Command};
 use dxm_artifacts::cfx::{ArtifactsChannel, ArtifactsPlatform};
+use dxm_manifest::lockfile::Lockfile;
 
 /// The command structure.
 pub fn cli() -> Command {
@@ -41,20 +42,16 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let artifact = &mut manifest.artifact;
 
     let mut version = if let Some(version) = version_arg {
+        artifact.set_version(version.clone());
         version.clone()
     } else {
         artifact.version().to_owned()
     };
 
-    if version.is_empty() {
-        version = artifact.channel().to_string()
-    };
-
     let client = crate::util::reqwest::github_client().build()?;
     let platform = ArtifactsPlatform::default();
-    let channel = ArtifactsChannel::from_str(&version);
 
-    if let Ok(channel) = channel {
+    if let Some(channel) = artifact.channel() {
         log::info!("getting versions");
 
         if channel == ArtifactsChannel::LatestJg {
@@ -68,12 +65,12 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
 
     let path = path.unwrap_or_else(|| artifact.path(&manifest_path));
     artifact.set_path(&manifest_path, &path)?;
-    artifact.set_version(version.clone());
 
     log::info!("installing artifact {}", &version);
 
-    dxm_artifacts::install(&client, &platform, &version, path)?;
-    manifest.write_artifact(manifest_path)?;
+    let artifact_url = dxm_artifacts::install(&client, &platform, &version, path)?;
+    manifest.write_artifact(&manifest_path)?;
+    Lockfile::write_artifact_url(manifest_path, artifact_url)?;
 
     log::info!("successfully installed artifact");
 

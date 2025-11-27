@@ -12,6 +12,7 @@ use toml_edit::{DocumentMut, Item};
 use crate::util::{add_and_fill_inline_table, add_and_fill_missing_table};
 
 pub mod artifact;
+pub mod lockfile;
 pub mod resource;
 pub mod server;
 mod util;

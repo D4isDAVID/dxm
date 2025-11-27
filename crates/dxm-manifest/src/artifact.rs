@@ -2,6 +2,7 @@
 
 use std::{
     path::{Path, PathBuf, StripPrefixError},
+    str::FromStr,
     sync::LazyLock,
 };
 
@@ -11,8 +12,7 @@ use serde::{Deserialize, Serialize};
 use crate::util::relative_path;
 
 static DEFAULT_PATH: LazyLock<PathBuf> = LazyLock::new(|| PathBuf::from("artifact"));
-const DEFAULT_VERSION: &str = "";
-const DEFAULT_CHANNEL: ArtifactsChannel = ArtifactsChannel::LatestJg;
+static DEFAULT_CHANNEL: LazyLock<String> = LazyLock::new(|| ArtifactsChannel::LatestJg.to_string());
 
 /// Represents a dxm-managed FXServer installation.
 #[derive(Serialize, Deserialize)]
@@ -21,16 +21,13 @@ pub struct Artifact {
     path: Option<PathBuf>,
     /// The FXServer artifact version.
     version: Option<String>,
-    /// The FXServer update channel such as recommended, latest, etc.
-    channel: Option<ArtifactsChannel>,
 }
 
 impl Default for Artifact {
     fn default() -> Self {
         Self {
             path: Some(DEFAULT_PATH.to_path_buf()),
-            version: Some(DEFAULT_VERSION.to_owned()),
-            channel: Some(DEFAULT_CHANNEL),
+            version: Some(DEFAULT_CHANNEL.to_string()),
         }
     }
 }
@@ -78,23 +75,18 @@ impl Artifact {
 
     /// Returns the installation's version.
     pub fn version(&self) -> &str {
-        self.version.as_deref().unwrap_or(DEFAULT_VERSION)
+        self.version.as_deref().unwrap_or(DEFAULT_CHANNEL.as_str())
     }
 
-    /// Sets the installation's update channel.
-    pub fn set_channel(&mut self, channel: ArtifactsChannel) {
-        self.channel = Some(channel);
-    }
-
-    /// Returns the installation's update channel.
-    pub fn channel(&self) -> ArtifactsChannel {
-        self.channel.unwrap_or(DEFAULT_CHANNEL)
+    /// Returns the installation's channel if the version is a channel, None
+    /// otherwise.
+    pub fn channel(&self) -> Option<ArtifactsChannel> {
+        ArtifactsChannel::from_str(self.version()).ok()
     }
 
     /// Fills out information about the installation inside the given TOML document.
     pub fn fill_toml_item(&self, item: &mut toml_edit::Item) {
         item["path"] = toml_edit::value(self.relative_path().to_string_lossy().into_owned());
         item["version"] = toml_edit::value(self.version());
-        item["channel"] = toml_edit::value(self.channel().to_string());
     }
 }

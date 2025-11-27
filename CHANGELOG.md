@@ -11,13 +11,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `dxm add` to install resources.
+- `dxm add` to install resources - supports direct downloads, and GitHub URLs.
 - `dxm remove` to uninstall resources.
+- Lockfile to lock and keep track of download URLs.
 
 ### Changed
 
+- **Breaking:** updated the default value of the `version` field in the manifest
+  from an empty string to the `latest-jg` update channel.
 - Updated dependencies.
 - Optimized the binary file size.
+
+### Removed
+
+- **Breaking:** the `channel` field from the manifest - it has been merged with
+  the `version` field.
 
 ## [0.1.2] - 2025-07-20
 

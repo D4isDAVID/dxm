@@ -26,13 +26,14 @@ impl Display for InvalidResourceNameError {
 impl Error for InvalidResourceNameError {}
 
 /// Downloads and installs the given archive URL to the given directory path.
+/// Returns the archive download URL.
 pub fn install<U, P, S, N>(
     client: &Client,
     url: U,
     base_path: P,
     name: S,
     nested_path: N,
-) -> Result<(), Box<dyn Error>>
+) -> Result<String, Box<dyn Error>>
 where
     U: AsRef<str>,
     P: AsRef<Path>,
@@ -55,7 +56,7 @@ where
     fs_err::create_dir_all(&path)?;
 
     let mut file = NamedTempFile::with_suffix(name)?;
-    let bytes = client.get(url).send()?.bytes()?;
+    let bytes = client.get(&url).send()?.bytes()?;
     file.write_all(&bytes)?;
 
     log::trace!("extracting archive for {}", name);
@@ -65,7 +66,42 @@ where
     fs_err::rename(dir.path().join(nested_path), &path)?;
     fs_err::write(path.join(".gitignore"), ROOT_GITIGNORE)?;
 
-    Ok(())
+    Ok(url)
+}
+
+pub fn update<U, P, S, N>(
+    client: &Client,
+    url: U,
+    base_path: P,
+    name: S,
+    nested_path: N,
+) -> Result<String, Box<dyn Error>>
+where
+    U: AsRef<str>,
+    P: AsRef<Path>,
+    S: AsRef<str>,
+    N: AsRef<Path>,
+{
+    let base_path = base_path.as_ref();
+    let name = name.as_ref();
+
+    let path = base_path.join(name);
+
+    if path.components().count() > base_path.components().count() + 1 {
+        Err(InvalidResourceNameError {})?;
+    }
+
+    let dir = TempDir::with_suffix(name)?;
+    fs_err::rename(&path, &dir)?;
+
+    match install(client, url, base_path, name, nested_path) {
+        Ok(url) => Ok(url),
+        Err(err) => {
+            fs_err::rename(dir, path)?;
+
+            Err(err)
+        }
+    }
 }
 
 pub fn uninstall<P, S>(base_path: P, name: S) -> Result<(), Box<dyn Error>>

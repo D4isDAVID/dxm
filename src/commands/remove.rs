@@ -3,6 +3,7 @@
 use std::{error::Error, path::PathBuf};
 
 use clap::{Arg, ArgMatches, Command};
+use dxm_manifest::lockfile::Lockfile;
 
 /// The command structure.
 pub fn cli() -> Command {
@@ -43,7 +44,8 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         log::info!("uninstalling resource {}", &name);
 
         dxm_resources::uninstall(base_path, name)?;
-        manifest.write_resources(manifest_path)?;
+        manifest.write_resources(&manifest_path)?;
+        Lockfile::unwrite_resource_url(manifest_path, name)?;
 
         log::info!("successfully uninstalled resource");
     } else {

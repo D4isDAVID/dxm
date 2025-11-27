@@ -3,7 +3,7 @@
 use std::{error::Error, path::PathBuf};
 
 use clap::{Arg, ArgMatches, Command};
-use dxm_manifest::resource::Resource;
+use dxm_manifest::{lockfile::Lockfile, resource::Resource};
 
 /// The command structure.
 pub fn cli() -> Command {
@@ -70,8 +70,9 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
 
     log::info!("installing resource {}", &name);
 
-    dxm_resources::install(&client, url, base_path, name, nested_path)?;
-    manifest.write_resources(manifest_path)?;
+    let resource_url = dxm_resources::install(&client, url, base_path, name, nested_path)?;
+    manifest.write_resources(&manifest_path)?;
+    Lockfile::write_resource_url(manifest_path, name, resource_url)?;
 
     log::info!("successfully installed resource");
 
