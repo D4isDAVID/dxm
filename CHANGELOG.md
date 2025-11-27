@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `dxm add` to install resources - supports direct downloads, and GitHub URLs.
 - `dxm remove` to uninstall resources.
 - Lockfile to lock and keep track of download URLs.
+- `dxm install` to install artifacts & servers.
+- `dxm update` to update artifacts & servers.
 
 ### Changed
 

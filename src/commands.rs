@@ -13,6 +13,7 @@ pub mod new;
 pub mod remove;
 pub mod run;
 pub mod self_cmd;
+pub mod update;
 
 /// Options passed to the top-level `execute` function.
 pub struct ExecuteOptions {
@@ -70,6 +71,7 @@ pub fn cli() -> Command {
         .subcommand(remove::cli())
         .subcommand(run::cli())
         .subcommand(self_cmd::cli())
+        .subcommand(update::cli())
         .arg_required_else_help(true)
         .subcommand_required(true)
 }
@@ -87,6 +89,7 @@ pub fn execute(args: &ArgMatches, options: &ExecuteOptions) -> Result<(), Box<dy
         Some(("remove", m)) => remove::execute(m)?,
         Some(("run", m)) => run::execute(m)?,
         Some(("self", m)) => self_cmd::execute(m)?,
+        Some(("update", m)) => update::execute(m)?,
         _ => unreachable!(),
     }
 

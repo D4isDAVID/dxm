@@ -36,7 +36,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     if let Some(version) = lockfile.artifact_version() {
         log::info!("installing artifact {}", &version);
 
-        dxm_artifacts::install(&client, &platform, &version, artifact.path(&manifest_path))?;
+        dxm_artifacts::install(&client, &platform, version, artifact.path(&manifest_path))?;
     } else {
         crate::util::artifacts::update(&manifest_path, &manifest)?;
 
@@ -46,13 +46,13 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let resources_path = &manifest.server.resources(&manifest_path);
 
     for (resource_name, resource) in manifest.resources.iter() {
-        log::info!("installing resource {}", resource_name);
-
         let url = lockfile.get_resource_url(resource_name).or(resource.url());
         let base_path = resource.category(resources_path);
         let nested_path = resource.nested_path();
 
         if let Some(url) = url {
+            log::info!("installing resource {}", resource_name);
+
             let resource_url =
                 dxm_resources::install(&client, url, base_path, resource_name, nested_path)?;
 
