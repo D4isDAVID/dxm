@@ -92,7 +92,7 @@ impl Lockfile {
     {
         let path = Self::dir_manifest(dir);
 
-        log::debug!("reading lockfile path {}", path.display());
+        log::debug!("writing lockfile path {}", path.display());
 
         let contents = toml_edit::ser::to_string(self)?;
         fs_err::write(path, format!("{}{}", LOCKFILE_COMMENT, contents))?;
