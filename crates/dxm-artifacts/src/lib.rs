@@ -54,7 +54,7 @@ where
     let url = platform.runtime_url(version, commit_sha);
 
     log::trace!("download fxserver archive");
-    let bytes = client.get(url).send()?.bytes()?;
+    let bytes = client.get(url).send()?.error_for_status()?.bytes()?;
     writer.write_all(&bytes)?;
 
     Ok(())

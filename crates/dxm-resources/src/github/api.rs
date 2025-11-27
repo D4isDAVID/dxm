@@ -22,10 +22,7 @@ pub struct GithubRepository {
     default_branch: String,
 }
 
-pub fn get_latest_release_archive<S>(
-    client: &Client,
-    repo: S,
-) -> Result<Option<String>, Box<dyn Error>>
+pub fn get_latest_release_archive<S>(client: &Client, repo: S) -> Result<String, Box<dyn Error>>
 where
     S: AsRef<str>,
 {
@@ -36,11 +33,7 @@ where
     get_release_archive_internal(client, repo, release_url)
 }
 
-pub fn get_release_archive<R, S>(
-    client: &Client,
-    repo: R,
-    tag: S,
-) -> Result<Option<String>, Box<dyn Error>>
+pub fn get_release_archive<R, S>(client: &Client, repo: R, tag: S) -> Result<String, Box<dyn Error>>
 where
     R: AsRef<str>,
     S: AsRef<str>,
@@ -53,25 +46,20 @@ where
     get_release_archive_internal(client, repo, release_url)
 }
 
-pub fn get_default_branch_archive<S>(
-    client: &Client,
-    repo: S,
-) -> Result<Option<String>, Box<dyn Error>>
+pub fn get_default_branch_archive<S>(client: &Client, repo: S) -> Result<String, Box<dyn Error>>
 where
     S: AsRef<str>,
 {
     let repo = repo.as_ref();
 
     let repo_url = repo_api_url(repo);
-    let response = client.get(repo_url).send()?;
+    let repo = client
+        .get(repo_url)
+        .send()?
+        .error_for_status()?
+        .json::<GithubRepository>()?;
 
-    if !response.status().is_success() {
-        return Ok(None);
-    }
-
-    let repo = response.json::<GithubRepository>()?;
-
-    Ok(Some(repo.default_branch))
+    Ok(repo.default_branch)
 }
 
 pub fn get_branch_or_commit_archive<R, S>(
@@ -122,25 +110,24 @@ fn get_release_archive_internal<R, S>(
     client: &Client,
     repo: R,
     release_url: S,
-) -> Result<Option<String>, Box<dyn Error>>
+) -> Result<String, Box<dyn Error>>
 where
     R: AsRef<str>,
     S: AsRef<str>,
 {
-    let response = client.get(release_url.as_ref()).send()?;
+    let release = client
+        .get(release_url.as_ref())
+        .send()?
+        .error_for_status()?
+        .json::<GithubRelease>()?;
 
-    if !response.status().is_success() {
-        return Ok(None);
-    }
-
-    let release = response.json::<GithubRelease>()?;
     let archive_url = release
         .assets
         .first()
         .map(|a| a.browser_download_url.clone())
         .unwrap_or_else(|| get_tag_archive(repo, release.tag_name));
 
-    Ok(Some(archive_url))
+    Ok(archive_url)
 }
 
 fn get_tag_archive<R, S>(repo: R, tag: S) -> String

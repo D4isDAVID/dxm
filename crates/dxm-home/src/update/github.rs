@@ -51,6 +51,7 @@ pub fn latest_release(client: &Client) -> reqwest::Result<Release> {
     client
         .get(GITHUB_LATEST_RELEASE_API_URL)
         .send()?
+        .error_for_status()?
         .json::<Release>()
 }
 
@@ -70,7 +71,7 @@ where
         .ok_or("couldn't find archive url")?;
 
     log::trace!("downloading update archive");
-    let bytes = client.get(url).send()?.bytes()?;
+    let bytes = client.get(url).send()?.error_for_status()?.bytes()?;
     writer.write_all(&bytes)?;
 
     Ok(())

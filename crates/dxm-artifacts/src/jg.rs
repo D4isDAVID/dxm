@@ -28,7 +28,10 @@ impl Artifacts {
 pub fn artifacts(client: &Client) -> reqwest::Result<Artifacts> {
     log::trace!("getting artifacts database");
 
-    let resp = client.get(JGSCRIPTS_ARTIFACTS_API_URL).send()?;
+    let resp = client
+        .get(JGSCRIPTS_ARTIFACTS_API_URL)
+        .send()?
+        .error_for_status()?;
 
     resp.json::<Artifacts>()
 }

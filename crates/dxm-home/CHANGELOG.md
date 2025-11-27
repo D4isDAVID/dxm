@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated dependencies.
+- Made HTTP requests with bad response statuses throw an error to give a better
+  error message, instead of immediately attempting to parse the response.
 
 ## 0.1.1 - 2025-07-20
 

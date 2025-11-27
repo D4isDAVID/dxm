@@ -9,8 +9,6 @@ pub enum InvalidGithubUrlErrorKind {
     InvalidLink,
     NoAuthor,
     NoName,
-    DefaultFailed,
-    ReleaseFailed,
 }
 
 impl Display for InvalidGithubUrlErrorKind {
@@ -19,8 +17,6 @@ impl Display for InvalidGithubUrlErrorKind {
             InvalidGithubUrlErrorKind::InvalidLink => "invalid link",
             InvalidGithubUrlErrorKind::NoAuthor => "no repository author",
             InvalidGithubUrlErrorKind::NoName => "no repository name",
-            InvalidGithubUrlErrorKind::DefaultFailed => "couldn't fetch default branch or release",
-            InvalidGithubUrlErrorKind::ReleaseFailed => "couldn't fetch release",
         };
 
         write!(f, "{}", str)?;
@@ -84,23 +80,10 @@ where
         let release_data = parts.get(4).unwrap_or(&"");
 
         if link_type.is_empty() || link_data.is_empty() || (is_release && release_data.is_empty()) {
-            if let Some(archive_url) = api::get_latest_release_archive(client, &repo)? {
-                return Ok(archive_url);
-            }
-
-            if let Some(archive_url) = api::get_default_branch_archive(client, repo)? {
-                return Ok(archive_url);
-            }
-
-            return Err(InvalidGithubUrlError::new(
-                InvalidGithubUrlErrorKind::DefaultFailed,
-            ))?;
+            api::get_latest_release_archive(client, &repo)
+                .or_else(|_| api::get_default_branch_archive(client, repo))
         } else if is_release {
-            let archive_url = api::get_release_archive(client, repo, release_data)?.ok_or(
-                InvalidGithubUrlError::new(InvalidGithubUrlErrorKind::ReleaseFailed),
-            )?;
-
-            Ok(archive_url)
+            api::get_release_archive(client, repo, release_data)
         } else {
             let archive_url = api::get_branch_or_commit_archive(client, repo, link_data)?;
 

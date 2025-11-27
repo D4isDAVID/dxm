@@ -35,11 +35,19 @@ where
 
     log::trace!("getting github tag ref");
     let ref_url = GITHUB_TAG_REF_API_URL.replace("{version}", version);
-    let github_ref = client.get(ref_url).send()?.json::<Ref>()?;
+    let github_ref = client
+        .get(ref_url)
+        .send()?
+        .error_for_status()?
+        .json::<Ref>()?;
 
     log::trace!("getting github tag");
     let tag_url = github_ref.object.url;
-    let github_tag = client.get(tag_url).send()?.json::<Tag>()?;
+    let github_tag = client
+        .get(tag_url)
+        .send()?
+        .error_for_status()?
+        .json::<Tag>()?;
 
     Ok(github_tag.object.sha)
 }

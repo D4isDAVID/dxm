@@ -74,7 +74,7 @@ pub fn versions(client: &Client, platform: &ArtifactsPlatform) -> reqwest::Resul
     log::trace!("getting artifacts versions");
 
     let url = changelogs_url(platform);
-    let resp = client.get(url).send()?;
+    let resp = client.get(url).send()?.error_for_status()?;
 
     resp.json::<ServerVersions>()
 }

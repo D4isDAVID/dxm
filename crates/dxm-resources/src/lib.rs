@@ -56,7 +56,7 @@ where
     fs_err::create_dir_all(&path)?;
 
     let mut file = NamedTempFile::with_suffix(name)?;
-    let bytes = client.get(&url).send()?.bytes()?;
+    let bytes = client.get(&url).send()?.error_for_status()?.bytes()?;
     file.write_all(&bytes)?;
 
     log::debug!("extracting {} into {}", name, nested_path.display());
