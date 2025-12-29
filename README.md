@@ -5,11 +5,10 @@
 
 A manager for FXServer artifacts & resources.
 
-Need support? Check out the [Discord server](https://discord.gg/rdjpS2K8hC)!
+## Support
 
-- [Key Features](#key-features)
-- [Installation](#installation)
-- [Usage](#usage)
+For questions or general support, use [GitHub Discussions] or join the
+[Discord server].
 
 ## Key Features
 
@@ -18,63 +17,39 @@ Need support? Check out the [Discord server](https://discord.gg/rdjpS2K8hC)!
 dxm can automatically install and update new artifacts for you.
 Supports JG Scripts' [Artifacts DB]!
 
+### Resource Management
+
+dxm can automatically install and update server resources for you.
+Currently supports GitHub and direct download URLs.
+
 ### Planned
 
-- Resource Management
-- Recipes
+A list of planned features can be found on the [GitHub Project].
 
-## Installation
+## Getting Started
 
-### Install
+Read the [User Guide] for installation and usage instructions.
 
-dxm includes a command that sets up a new `.dxm` directory in your user's home
-directory, and adds it to the environment `PATH`.
+## Security
 
-1. Install the appropriate archive for your Operating System from the latest
-  [GitHub release].
-2. Unpack the binary from the downloaded archive.
-3. Open a terminal in the directory of the installed binary.
-4. Run `./dxm.exe self setup` on Windows or `./dxm self setup` on Linux.
+If you believe you have found a security vulnerability, **DO NOT**
+open an issue. Please follow the [Security Policy] instead.
 
-After completing these steps, you will be able to use `dxm` from anywhere next
-time you start up the terminal.
+## Contributing
 
-### Update
+If you are interested in contributing to this project, read the
+[Contributing guidelines] to learn more.
 
-To update dxm, run `dxm self update`.
-This will automatically install the latest [GitHub release].
+## License
 
-### Uninstall
+This project's source code © 2025 David Malchin is licensed under the
+**MIT License (MIT)** provided in the [LICENSE] file.
 
-To uninstall dxm, simply run `dxm self uninstall`.
-This will remove the dxm files, and remove them from the environment `PATH`.
-
-## Usage
-
-### The Manifest
-
-dxm works using a `dxm.toml` file in the root of your server.
-
-This file will contain all the data dxm needs to manage it.
-
-### Creating a Server
-
-You can use `dxm new [name]` or `dxm init` to create a new server with some
-basic files, a git repository, and the latest artifacts.
-
-You can then use `dxm run` to start the server.
-
-### Managing Artifacts
-
-You can use `dxm artifacts install [version]` to install a new artifacts
-version. You may use either version numbers, or aliases such as `recommended`,
-`latest`, and `latest-jg`.
-
-Next time you need to install artifacts, you can use `dxm artifacts install` to
-install the version specified in `dxm.toml`.
-
-To update the artifacts, you can use `dxm artifacts update` to download the
-latest artifact applicable to the update channel in `dxm.toml`.
-
-[github release]: https://github.com/D4isDAVID/dxm/releases
+[github discussions]: https://github.com/D4isDAVID/dxm/discussions
+[discord server]: https://discord.gg/rdjpS2K8hC
 [artifacts db]: https://artifacts.jgscripts.com
+[github project]: https://github.com/users/D4isDAVID/projects/3/views/2
+[user guide]: ./user-guide.md
+[security policy]: https://github.com/D4isDAVID/dxm/security/policy
+[contributing guidelines]: ./CONTRIBUTING.md
+[license]: ./LICENSE
