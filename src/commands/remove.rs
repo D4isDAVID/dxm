@@ -32,24 +32,18 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         .expect("no manifest path");
 
     let (manifest_path, mut manifest) = crate::util::manifest::find(manifest_path)?;
-    let resources = &mut manifest.resources;
-    let resource = resources.get(name);
+    let mut lockfile = Lockfile::read(&manifest_path)?;
 
-    if let Some(resource) = resource {
-        let server_resources = &manifest.server.resources(&manifest_path);
-        let base_path = resource.category(server_resources);
+    if manifest.resources.contains_key(name) {
+        crate::util::resources::uninstall_single(&manifest_path, &manifest, &mut lockfile, name)?;
 
-        resources.remove(name);
-
-        log::info!("uninstalling resource {}", &name);
-
-        dxm_resources::uninstall(base_path, name)?;
+        manifest.resources.remove(name);
         manifest.write_resources(&manifest_path)?;
-        Lockfile::unwrite_resource_url(manifest_path, name)?;
+        lockfile.write(manifest_path)?;
 
         log::info!("successfully uninstalled resource");
     } else {
-        log::error!("resource {} not installed", name);
+        log::error!("resource {} is not installed", name);
     }
 
     Ok(())

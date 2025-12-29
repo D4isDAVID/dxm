@@ -3,6 +3,7 @@
 use std::{error::Error, path::PathBuf};
 
 use clap::{Arg, ArgAction, ArgMatches, Command};
+use dxm_artifacts::cfx::ArtifactsPlatform;
 use dxm_manifest::lockfile::Lockfile;
 
 /// The command structure.
@@ -38,54 +39,40 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         .expect("no manifest path");
 
     let (manifest_path, manifest) = crate::util::manifest::find(manifest_path)?;
-    let resources_path = &manifest.server.resources(&manifest_path);
+    let mut lockfile = Lockfile::read(&manifest_path)?;
 
     let client = crate::util::reqwest::github_client().build()?;
+    let platform = ArtifactsPlatform::default();
 
     if args.get_flag("all") {
-        crate::util::artifacts::update(&manifest_path, &manifest)?;
-
-        let mut lockfile = Lockfile::read(&manifest_path)?;
-
-        for (resource_name, resource) in manifest.resources.iter() {
-            if let Some(url) = resource.url() {
-                log::info!("installing resource {}", resource_name);
-
-                let base_path = resource.category(resources_path);
-                let nested_path = resource.nested_path();
-
-                let resource_url =
-                    dxm_resources::update(&client, url, base_path, resource_name, nested_path)?;
-
-                lockfile.set_resource_url(resource_name, resource_url);
-            } else {
-                log::warn!("no download url found for {}", resource_name);
-            }
-        }
+        crate::util::artifacts::update(
+            &client,
+            &platform,
+            &manifest_path,
+            &manifest,
+            &mut lockfile,
+        )?;
+        crate::util::resources::update(&client, &manifest_path, &manifest, &mut lockfile)?;
 
         lockfile.write(manifest_path)?;
 
-        log::info!("successfully updated artifacts and resources");
+        log::info!("successfully updated resources");
     } else if let Some(resource_name) = args.get_one::<String>("resource") {
-        if let Some(resource) = manifest.resources.get(resource_name) {
-            if let Some(url) = resource.url() {
-                log::info!("installing resource {}", resource_name);
+        if manifest.resources.contains_key(resource_name) {
+            crate::util::resources::update_single(
+                &client,
+                &manifest_path,
+                &manifest,
+                &mut lockfile,
+                resource_name,
+            )?;
 
-                let base_path = resource.category(resources_path);
-                let nested_path = resource.nested_path();
+            lockfile.write(manifest_path)?;
 
-                let resource_url =
-                    dxm_resources::update(&client, url, base_path, resource_name, nested_path)?;
-
-                Lockfile::write_resource_url(manifest_path, resource_name, resource_url)?;
-            } else {
-                log::warn!("no download url found for {}", resource_name);
-            }
+            log::info!("successfully updated resource");
         } else {
             log::error!("no such resource {}", resource_name);
         }
-
-        log::info!("successfully updated resource");
     } else {
         log::error!("specify either --resource or --all to update");
     }

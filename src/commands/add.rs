@@ -61,9 +61,9 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         .unwrap_or(PathBuf::from(""));
 
     let (manifest_path, mut manifest) = crate::util::manifest::find(manifest_path)?;
+    let mut lockfile = Lockfile::read(&manifest_path)?;
+
     let resources = &mut manifest.resources;
-    let server_resources = &manifest.server.resources(&manifest_path);
-    let base_path = server_resources.join(&category);
 
     if resources.contains_key(name) {
         log::error!("resource {} already exists in this server", name);
@@ -71,14 +71,20 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         return Ok(());
     }
 
-    let client = crate::util::reqwest::client().build()?;
     resources.insert(name.clone(), Resource::new(url, category, &nested_path));
 
-    log::info!("installing resource {}", &name);
+    let client = crate::util::reqwest::client().build()?;
 
-    let resource_url = dxm_resources::install(&client, url, base_path, name, nested_path)?;
+    crate::util::resources::install_single(
+        &client,
+        &manifest_path,
+        &manifest,
+        &mut lockfile,
+        name,
+    )?;
+
     manifest.write_resources(&manifest_path)?;
-    Lockfile::write_resource_url(manifest_path, name, resource_url)?;
+    lockfile.write(&manifest_path)?;
 
     log::info!("successfully installed resource");
 

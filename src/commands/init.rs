@@ -24,12 +24,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
 
     let path = std::env::current_dir()?;
 
-    log::info!("creating files");
-
-    dxm_init::server(&path, vcs)?;
-
-    let (path, manifest) = crate::util::manifest::find(path)?;
-    crate::util::artifacts::update(path, &manifest)?;
+    crate::util::init::server(path, vcs)?;
 
     Ok(())
 }

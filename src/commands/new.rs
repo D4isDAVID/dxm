@@ -30,12 +30,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let path = args.get_one::<PathBuf>("path").expect("no path");
     let vcs = args.get_one::<VcsOption>("vcs").expect("no vcs");
 
-    log::info!("creating files");
-
-    dxm_init::server(path, vcs)?;
-
-    let (path, manifest) = crate::util::manifest::find(path)?;
-    crate::util::artifacts::update(path, &manifest)?;
+    crate::util::init::server(path, vcs)?;
 
     Ok(())
 }

@@ -77,7 +77,11 @@ where
         let link_type = parts.get(2).unwrap_or(&"");
         let is_release = link_type == &"releases";
         let link_data = parts.get(3).unwrap_or(&"");
-        let release_data = parts.get(4).unwrap_or(&"");
+        let release_data = if link_data == &"tag" || link_data == &"download" {
+            parts.get(4).unwrap_or(&"")
+        } else {
+            link_data
+        };
 
         if link_type.is_empty() || link_data.is_empty() || (is_release && release_data.is_empty()) {
             api::get_latest_release_archive(client, &repo)

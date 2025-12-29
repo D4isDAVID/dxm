@@ -26,45 +26,17 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         .expect("no manifest path");
 
     let (manifest_path, manifest) = crate::util::manifest::find(manifest_path)?;
-    let artifact = &manifest.artifact;
-
     let mut lockfile = Lockfile::read(&manifest_path)?;
 
     let client = crate::util::reqwest::github_client().build()?;
     let platform = ArtifactsPlatform::default();
 
-    if let Some(version) = lockfile.artifact_version() {
-        log::info!("installing artifact {}", &version);
-
-        dxm_artifacts::install(&client, &platform, version, artifact.path(&manifest_path))?;
-    } else {
-        crate::util::artifacts::update(&manifest_path, &manifest)?;
-
-        lockfile = Lockfile::read(&manifest_path)?;
-    }
-
-    let resources_path = &manifest.server.resources(&manifest_path);
-
-    for (resource_name, resource) in manifest.resources.iter() {
-        let url = lockfile.get_resource_url(resource_name).or(resource.url());
-        let base_path = resource.category(resources_path);
-        let nested_path = resource.nested_path();
-
-        if let Some(url) = url {
-            log::info!("installing resource {}", resource_name);
-
-            let resource_url =
-                dxm_resources::install(&client, url, base_path, resource_name, nested_path)?;
-
-            lockfile.set_resource_url(resource_name, resource_url);
-        } else {
-            log::warn!("no download url found for {}", resource_name);
-        }
-    }
+    crate::util::artifacts::install(&client, &platform, &manifest_path, &manifest, &mut lockfile)?;
+    crate::util::resources::install(&client, &manifest_path, &manifest, &mut lockfile)?;
 
     lockfile.write(manifest_path)?;
 
-    log::info!("successfully installed artifacts and resources");
+    log::info!("successfully installed resources");
 
     Ok(())
 }

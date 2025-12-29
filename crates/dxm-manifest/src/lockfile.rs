@@ -105,51 +105,6 @@ impl Lockfile {
         Ok(())
     }
 
-    pub fn write_artifact_version<P, S>(dir: P, artifact_version: S) -> Result<(), Box<dyn Error>>
-    where
-        P: AsRef<Path>,
-        S: AsRef<str>,
-    {
-        let dir = dir.as_ref();
-        let artifact_version = artifact_version.as_ref();
-
-        let mut doc = Self::read(dir)?;
-        doc.set_artifact_version(artifact_version);
-        doc.write(dir)
-    }
-
-    pub fn write_resource_url<P, N, S>(
-        dir: P,
-        resource_name: N,
-        resource_url: S,
-    ) -> Result<(), Box<dyn Error>>
-    where
-        P: AsRef<Path>,
-        N: AsRef<str>,
-        S: AsRef<str>,
-    {
-        let dir = dir.as_ref();
-        let resource_name = resource_name.as_ref();
-        let resource_url = resource_url.as_ref();
-
-        let mut doc = Self::read(dir)?;
-        doc.set_resource_url(resource_name, resource_url);
-        doc.write(dir)
-    }
-
-    pub fn unwrite_resource_url<P, S>(dir: P, resource_name: S) -> Result<(), Box<dyn Error>>
-    where
-        P: AsRef<Path>,
-        S: AsRef<str>,
-    {
-        let dir = dir.as_ref();
-        let resource_name = resource_name.as_ref();
-
-        let mut doc = Self::read(dir)?;
-        doc.remove_resource_url(resource_name);
-        doc.write(dir)
-    }
-
     /// Returns the given directory's path joined with the lockfile file name.
     fn dir_manifest<P>(dir: P) -> PathBuf
     where
