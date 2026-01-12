@@ -1,7 +1,8 @@
 //! A crate for installing third-party resources for FXServer.
 
-use std::{error::Error, fmt::Display, io::Write, path::Path};
+use std::{error::Error, io::Write, path::Path};
 
+use fs_extra::dir::{CopyOptions, move_dir};
 use reqwest::blocking::Client;
 use tempfile::{NamedTempFile, TempDir};
 use zip::{ZipArchive, read::root_dir_common_filter};
@@ -12,113 +13,83 @@ const ROOT_GITIGNORE: &str = "\
 *
 ";
 
-#[derive(Debug)]
-pub struct InvalidResourceNameError;
-
-impl Display for InvalidResourceNameError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "invalid resource name")?;
-
-        Ok(())
-    }
-}
-
-impl Error for InvalidResourceNameError {}
-
-/// Downloads and installs the given archive URL to the given directory path.
-/// Returns the archive download URL.
-pub fn install<U, P, S, N>(
-    client: &Client,
-    url: U,
-    base_path: P,
-    name: S,
-    nested_path: N,
-) -> Result<String, Box<dyn Error>>
+pub fn resolve_download_url<S>(client: &Client, url: S) -> Result<String, Box<dyn Error>>
 where
-    U: AsRef<str>,
-    P: AsRef<Path>,
     S: AsRef<str>,
-    N: AsRef<Path>,
 {
-    let url = url.as_ref();
-    let base_path = base_path.as_ref();
-    let name = name.as_ref();
-    let nested_path = nested_path.as_ref();
-
-    let path = base_path.join(name);
-
-    if path.components().count() > base_path.components().count() + 1 {
-        Err(InvalidResourceNameError {})?;
-    }
-
     let url = github::resolve_download_url(client, url)?;
-
-    fs_err::create_dir_all(&path)?;
-
-    let mut file = NamedTempFile::with_suffix(name)?;
-    let bytes = client.get(&url).send()?.error_for_status()?.bytes()?;
-    file.write_all(&bytes)?;
-
-    log::debug!("extracting {} into {}", name, nested_path.display());
-    let dir = TempDir::with_suffix(name)?;
-    ZipArchive::new(file.reopen()?)?.extract_unwrapped_root_dir(&dir, root_dir_common_filter)?;
-
-    fs_err::rename(dir.path().join(nested_path), &path)?;
-    fs_err::write(path.join(".gitignore"), ROOT_GITIGNORE)?;
 
     Ok(url)
 }
 
-pub fn update<U, P, S, N>(
+/// Downloads and installs the given archive URL to the given directory path.
+/// Returns the archive download URL.
+pub fn install<S, P, N>(
     client: &Client,
-    url: U,
-    base_path: P,
-    name: S,
+    download_url: S,
+    path: P,
     nested_path: N,
-) -> Result<String, Box<dyn Error>>
+) -> Result<(), Box<dyn Error>>
 where
-    U: AsRef<str>,
-    P: AsRef<Path>,
     S: AsRef<str>,
+    P: AsRef<Path>,
     N: AsRef<Path>,
 {
-    let base_path = base_path.as_ref();
-    let name = name.as_ref();
+    let download_url = download_url.as_ref();
+    let path = path.as_ref();
+    let nested_path = nested_path.as_ref();
 
-    let path = base_path.join(name);
+    fs_err::create_dir_all(path)?;
 
-    if path.components().count() > base_path.components().count() + 1 {
-        Err(InvalidResourceNameError {})?;
+    let mut file = NamedTempFile::with_suffix("dxm-resource-archive")?;
+    let bytes = client
+        .get(download_url)
+        .send()?
+        .error_for_status()?
+        .bytes()?;
+    file.write_all(&bytes)?;
+
+    log::debug!("extracting resource into {}", nested_path.display());
+    let dir = TempDir::with_suffix("dxm-resource")?;
+    ZipArchive::new(file.reopen()?)?.extract_unwrapped_root_dir(&dir, root_dir_common_filter)?;
+
+    let copy_options = CopyOptions::new().content_only(true);
+    let mut original_dir: Option<TempDir> = None;
+
+    if is_dir_with_files(path)? {
+        let tempdir = TempDir::with_suffix("dxm-resource-original")?;
+        move_dir(path, &tempdir, &copy_options)?;
+        original_dir = Some(tempdir);
     }
 
-    let dir = TempDir::with_suffix(name)?;
-    fs_err::rename(&path, &dir)?;
-
-    match install(client, url, base_path, name, nested_path) {
-        Ok(url) => Ok(url),
-        Err(err) => {
-            fs_err::rename(dir, path)?;
-
-            Err(err)
-        }
+    let result = move_dir(dir.path().join(nested_path), path, &copy_options);
+    if result.is_err()
+        && let Some(original_dir) = original_dir
+    {
+        move_dir(original_dir, path, &copy_options)?;
     }
-}
+    result?;
 
-pub fn uninstall<P, S>(base_path: P, name: S) -> Result<(), Box<dyn Error>>
-where
-    P: AsRef<Path>,
-    S: AsRef<str>,
-{
-    let base_path = base_path.as_ref();
-    let name = name.as_ref();
-
-    let path = base_path.join(name);
-
-    if path.components().count() > base_path.components().count() + 1 {
-        Err(InvalidResourceNameError {})?;
-    }
-
-    fs_err::remove_dir_all(path)?;
+    fs_err::write(path.join(".gitignore"), ROOT_GITIGNORE)?;
 
     Ok(())
+}
+
+fn is_dir_with_files<P>(path: P) -> std::io::Result<bool>
+where
+    P: AsRef<Path>,
+{
+    let path = path.as_ref();
+
+    if !path.is_dir() {
+        return Ok(false);
+    };
+
+    for entry in fs_err::read_dir(path)? {
+        if entry?.file_type()?.is_file() {
+            return Ok(true);
+        }
+    }
+
+    Ok(false)
 }

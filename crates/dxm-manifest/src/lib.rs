@@ -15,6 +15,7 @@ pub mod artifact;
 pub mod lockfile;
 pub mod resource;
 pub mod server;
+pub mod sourcefile;
 mod util;
 
 const MANIFEST_NAME: &str = "dxm.toml";

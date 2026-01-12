@@ -1,7 +1,7 @@
 use std::{error::Error, path::Path};
 
 use dxm_artifacts::cfx::{ArtifactsChannel, ArtifactsPlatform};
-use dxm_manifest::{Manifest, lockfile::Lockfile};
+use dxm_manifest::{Manifest, lockfile::Lockfile, sourcefile};
 use reqwest::blocking::Client;
 
 pub fn install<P>(
@@ -15,14 +15,19 @@ where
     P: AsRef<Path>,
 {
     if let Some(version) = lockfile.artifact_version() {
+        let artifact_path = manifest.artifact.path(&manifest_path);
+        let source_version = sourcefile::read(&artifact_path)?;
+
+        if source_version.is_some_and(|v| v.trim() == version) {
+            log::info!("artifact {} already installed", &version);
+
+            return Ok(());
+        }
+
         log::info!("installing artifact {}", &version);
 
-        dxm_artifacts::install(
-            client,
-            platform,
-            version,
-            manifest.artifact.path(&manifest_path),
-        )?;
+        dxm_artifacts::install(client, platform, version, &artifact_path)?;
+        sourcefile::write(artifact_path, version)?;
 
         log::info!("successfully installed artifact");
     } else {
@@ -43,6 +48,7 @@ where
     P: AsRef<Path>,
 {
     let artifact = &manifest.artifact;
+    let artifact_path = artifact.path(&manifest_path);
 
     let version = if let Some(channel) = artifact.channel() {
         log::info!("getting versions");
@@ -58,9 +64,19 @@ where
         artifact.version()
     };
 
+    let lockfile_updated = lockfile.artifact_version().is_some_and(|v| v == version);
+    let sourcefile_updated = sourcefile::read(&artifact_path)?.is_some_and(|v| v == version);
+
+    if lockfile_updated && sourcefile_updated {
+        log::info!("artifact {} already installed", &version);
+
+        return Ok(());
+    }
+
     log::info!("updating to artifact {}", &version);
 
-    dxm_artifacts::install(client, platform, version, artifact.path(&manifest_path))?;
+    dxm_artifacts::install(client, platform, version, &artifact_path)?;
+    sourcefile::write(artifact_path, version)?;
     lockfile.set_artifact_version(version);
 
     log::info!("successfully updated artifact");

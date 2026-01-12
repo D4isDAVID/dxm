@@ -1,6 +1,6 @@
-use std::{error::Error, path::Path};
+use std::{error::Error, fs, path::Path};
 
-use dxm_manifest::{Manifest, lockfile::Lockfile};
+use dxm_manifest::{Manifest, lockfile::Lockfile, sourcefile};
 use reqwest::blocking::Client;
 
 pub fn install<P>(
@@ -58,13 +58,23 @@ where
         let resources_path = &manifest.server.resources(manifest_path);
         let base_path = resource.category(resources_path);
         let nested_path = resource.nested_path();
+        let resource_path = base_path.join(resource_name);
+
+        let url = dxm_resources::resolve_download_url(client, url)?;
+        let source_url = sourcefile::read(base_path.join(resource_name))?;
+
+        if source_url.is_some_and(|u| u == url) {
+            log::info!("resource {} already installed", resource_name);
+
+            return Ok(());
+        }
 
         log::info!("installing resource {}", resource_name);
 
-        let resource_url =
-            dxm_resources::install(client, url, base_path, resource_name, nested_path)?;
+        dxm_resources::install(client, &url, &resource_path, nested_path)?;
 
-        lockfile.set_resource_url(resource_name, resource_url);
+        sourcefile::write(base_path.join(resource_name), &url)?;
+        lockfile.set_resource_url(resource_name, url);
     } else {
         log::warn!("no download url found for {}", resource_name);
     };
@@ -95,13 +105,27 @@ where
         let resources_path = &manifest.server.resources(manifest_path);
         let base_path = resource.category(resources_path);
         let nested_path = resource.nested_path();
+        let resource_path = base_path.join(resource_name);
+
+        let url = dxm_resources::resolve_download_url(client, url)?;
+        let lockfile_updated = lockfile
+            .get_resource_url(resource_name)
+            .is_some_and(|u| u == url);
+        let sourcefile_updated =
+            sourcefile::read(base_path.join(resource_name))?.is_some_and(|u| u == url);
+
+        if lockfile_updated && sourcefile_updated {
+            log::info!("resource {} already updated", resource_name);
+
+            return Ok(());
+        }
 
         log::info!("updating resource {}", resource_name);
 
-        let resource_url =
-            dxm_resources::update(client, url, base_path, resource_name, nested_path)?;
+        dxm_resources::install(client, &url, &resource_path, nested_path)?;
 
-        lockfile.set_resource_url(resource_name, resource_url);
+        sourcefile::write(base_path.join(resource_name), &url)?;
+        lockfile.set_resource_url(resource_name, url);
     } else {
         log::warn!("no download url found for {}", resource_name);
     };
@@ -129,10 +153,11 @@ where
 
     let resources_path = &manifest.server.resources(manifest_path);
     let base_path = resource.category(resources_path);
+    let resource_path = base_path.join(resource_name);
 
     log::info!("uninstalling resource {}", resource_name);
 
-    dxm_resources::uninstall(base_path, resource_name)?;
+    fs::remove_dir_all(resource_path)?;
 
     lockfile.remove_resource_url(resource_name);
 

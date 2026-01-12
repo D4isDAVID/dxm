@@ -11,6 +11,7 @@ include.workspace = true
 
 [dependencies]
 fs-err.workspace = true
+fs_extra.workspace = true
 log.workspace = true
 reqwest = { workspace = true, features = ["json"] }
 serde.workspace = true
