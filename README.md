@@ -1,7 +1,7 @@
 # dxm
 
 > [!NOTE]
-> This project is still in development.
+> This project is in active development. Expect issues and breaking changes.
 
 A manager for FXServer artifacts & resources.
 
