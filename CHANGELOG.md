@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [unreleased diff]
 
+## [0.2.0] - 2026-01-12
+
+[0.2.0 diff]
+
 ### Added
 
 - `dxm add` to install resources - supports direct downloads, and GitHub URLs.
@@ -55,7 +59,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release.
 
-[unreleased diff]: https://github.com/D4isDAVID/dxm/compare/v0.1.2...main
+[unreleased diff]: https://github.com/D4isDAVID/dxm/compare/v0.2.0...main
+[0.2.0]: https://github.com/D4isDAVID/dxm/releases/tag/v0.2.0
+[0.2.0 diff]: https://github.com/D4isDAVID/dxm/compare/v0.1.2...v0.2.0
 [0.1.2]: https://github.com/D4isDAVID/dxm/releases/tag/v0.1.2
 [0.1.2 diff]: https://github.com/D4isDAVID/dxm/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/D4isDAVID/dxm/releases/tag/v0.1.1
