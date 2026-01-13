@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+### Changed
+
+- **Breaking:** updated `github::resolve_download_url` to return `None` given a
+  non-GitHub URL.
+- **Breaking:** updated `resolve_download_url` to receive `Into<String>` instead
+  of `AsRef<str>`.
+
+### Fixed
+
+- `github::resolve_download_url` to return an error with an empty `github.com`
+  string without an ending slash.
+
 ## 0.1.0 - 2026-01-12
 
 [dxm 0.2.0]

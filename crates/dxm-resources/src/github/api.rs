@@ -22,7 +22,7 @@ pub struct GithubRepository {
     default_branch: String,
 }
 
-pub fn get_latest_release_archive<S>(client: &Client, repo: S) -> Result<String, Box<dyn Error>>
+pub fn get_latest_release_archive_url<S>(client: &Client, repo: S) -> Result<String, Box<dyn Error>>
 where
     S: AsRef<str>,
 {
@@ -30,10 +30,14 @@ where
 
     let release_url = repo_release_api_url(repo, "latest");
 
-    get_release_archive_internal(client, repo, release_url)
+    get_release_archive_url_internal(client, repo, release_url)
 }
 
-pub fn get_release_archive<R, S>(client: &Client, repo: R, tag: S) -> Result<String, Box<dyn Error>>
+pub fn get_release_archive_url<R, S>(
+    client: &Client,
+    repo: R,
+    tag: S,
+) -> Result<String, Box<dyn Error>>
 where
     R: AsRef<str>,
     S: AsRef<str>,
@@ -43,10 +47,10 @@ where
 
     let release_url = repo_release_api_url(repo, format!("tags/{}", tag));
 
-    get_release_archive_internal(client, repo, release_url)
+    get_release_archive_url_internal(client, repo, release_url)
 }
 
-pub fn get_default_branch_archive<S>(client: &Client, repo: S) -> Result<String, Box<dyn Error>>
+pub fn get_default_branch_archive_url<S>(client: &Client, repo: S) -> Result<String, Box<dyn Error>>
 where
     S: AsRef<str>,
 {
@@ -62,7 +66,7 @@ where
     Ok(repo.default_branch)
 }
 
-pub fn get_branch_or_commit_archive<R, S>(
+pub fn get_branch_or_commit_archive_url<R, S>(
     client: &Client,
     repo: R,
     commit: S,
@@ -78,13 +82,13 @@ where
     let response = client.head(branch_url).send()?;
 
     if response.status().is_success() {
-        return Ok(get_branch_archive(repo, commit));
+        return Ok(get_branch_archive_url(repo, commit));
     }
 
-    Ok(get_commit_archive(repo, commit))
+    Ok(get_commit_archive_url(repo, commit))
 }
 
-fn get_branch_archive<R, S>(repo: R, branch: S) -> String
+fn get_branch_archive_url<R, S>(repo: R, branch: S) -> String
 where
     R: AsRef<str>,
     S: AsRef<str>,
@@ -95,7 +99,7 @@ where
     repo_archive_url(repo, format!("refs/heads/{}", branch))
 }
 
-fn get_commit_archive<R, S>(repo: R, commit: S) -> String
+fn get_commit_archive_url<R, S>(repo: R, commit: S) -> String
 where
     R: AsRef<str>,
     S: AsRef<str>,
@@ -106,7 +110,7 @@ where
     repo_archive_url(repo, commit)
 }
 
-fn get_release_archive_internal<R, S>(
+fn get_release_archive_url_internal<R, S>(
     client: &Client,
     repo: R,
     release_url: S,
@@ -125,12 +129,12 @@ where
         .assets
         .first()
         .map(|a| a.browser_download_url.clone())
-        .unwrap_or_else(|| get_tag_archive(repo, release.tag_name));
+        .unwrap_or_else(|| get_tag_archive_url(repo, release.tag_name));
 
     Ok(archive_url)
 }
 
-fn get_tag_archive<R, S>(repo: R, tag: S) -> String
+fn get_tag_archive_url<R, S>(repo: R, tag: S) -> String
 where
     R: AsRef<str>,
     S: AsRef<str>,

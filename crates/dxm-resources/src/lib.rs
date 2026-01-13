@@ -15,11 +15,15 @@ const ROOT_GITIGNORE: &str = "\
 
 pub fn resolve_download_url<S>(client: &Client, url: S) -> Result<String, Box<dyn Error>>
 where
-    S: AsRef<str>,
+    S: Into<String>,
 {
-    let url = github::resolve_download_url(client, url)?;
+    let url = url.into();
 
-    Ok(url)
+    if let Some(github_url) = github::resolve_download_url(client, &url)? {
+        Ok(github_url)
+    } else {
+        Ok(url)
+    }
 }
 
 /// Downloads and installs the given archive URL to the given directory path.
