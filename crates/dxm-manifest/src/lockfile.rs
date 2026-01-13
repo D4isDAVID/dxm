@@ -8,7 +8,7 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
-const LOCKFILE_NAME: &str = "dxm-lock.toml";
+pub const LOCKFILE_NAME: &str = "dxm-lock.toml";
 const LOCKFILE_COMMENT: &str = "\
 # THIS IS AN *AUTO-GENERATED* FILE.
 # DO *NOT* MODIFY THIS FILE.

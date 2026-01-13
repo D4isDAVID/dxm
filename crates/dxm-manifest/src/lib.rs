@@ -18,7 +18,7 @@ pub mod server;
 pub mod sourcefile;
 mod util;
 
-const MANIFEST_NAME: &str = "dxm.toml";
+pub const MANIFEST_NAME: &str = "dxm.toml";
 
 /// The parent manifest structure containing data used by dxm.
 #[derive(Default, Serialize, Deserialize)]

@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+### Added
+
+- `MANIFEST_NAME` constant.
+- `lockfile::LOCKFILE_NAME` constant.
+- `sourcefile::SOURCEFILE_NAME` constant.
+
 ## 0.2.0 - 2026-01-12
 
 [dxm 0.2.0]

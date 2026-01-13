@@ -4,7 +4,7 @@
 
 use std::path::Path;
 
-const SOURCEFILE_NAME: &str = ".dxm-source";
+pub const SOURCEFILE_NAME: &str = ".dxm-source";
 
 /// Reads the sourcefile in the specified directory.
 pub fn read<P>(dir: P) -> std::io::Result<Option<String>>
