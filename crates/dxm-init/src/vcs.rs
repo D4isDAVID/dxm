@@ -2,7 +2,10 @@
 
 use std::{error::Error, fmt::Display, path::Path, str::FromStr};
 
+use dxm_manifest::Manifest;
 use git2::Repository;
+
+const GITIGNORE_NAME: &str = ".gitignore";
 
 const ROOT_GITIGNORE: &str = "\
 # FXServer
@@ -63,19 +66,20 @@ impl FromStr for VcsOption {
 
 impl VcsOption {
     /// Initialize the VCS repository and files.
-    pub fn init<P>(&self, path: P) -> Result<(), Box<dyn Error>>
+    pub fn init<P>(&self, path: P, manifest: &Manifest) -> Result<(), Box<dyn Error>>
     where
         P: AsRef<Path>,
     {
         let path = path.as_ref();
+        let data_path = manifest.server.data(path);
 
         match self {
             VcsOption::None => Ok(()),
             VcsOption::Git => {
                 Repository::init(path)?;
 
-                fs_err::write(path.join(".gitignore"), ROOT_GITIGNORE)?;
-                fs_err::write(path.join("data").join(".gitignore"), DATA_GITIGNORE)?;
+                fs_err::write(path.join(GITIGNORE_NAME), ROOT_GITIGNORE)?;
+                fs_err::write(data_path.join(GITIGNORE_NAME), DATA_GITIGNORE)?;
 
                 Ok(())
             }

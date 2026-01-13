@@ -7,6 +7,8 @@ use vcs::VcsOption;
 
 pub mod vcs;
 
+pub const SERVER_CFG_NAME: &str = "server.cfg";
+
 /// Initialize server data files in the given directory path with the given vcs.
 pub fn server<P>(path: P, vcs: &VcsOption) -> Result<(), Box<dyn Error>>
 where
@@ -16,12 +18,15 @@ where
 
     fs_err::create_dir_all(path)?;
 
-    Manifest::default().write(path)?;
+    let manifest = Manifest::default();
+    let data_path = manifest.server.data(path);
 
-    fs_err::create_dir_all(path.join("data").join("resources"))?;
-    fs_err::write(path.join("data").join("server.cfg"), "")?;
+    manifest.write(path)?;
 
-    vcs.init(path)?;
+    fs_err::create_dir_all(manifest.server.resources(path))?;
+    fs_err::write(data_path.join(SERVER_CFG_NAME), "")?;
+
+    vcs.init(path, &manifest)?;
 
     Ok(())
 }

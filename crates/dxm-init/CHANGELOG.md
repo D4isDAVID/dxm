@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+### Added
+
+- `SERVER_CFG_NAME` constant.
+
+### Changed
+
+- **Breaking:** updated `VcsOption::init` to accept a manifest instead of
+  hard-coding paths.
+- **Breaking:** updated `server` to use paths from the manifest instead of
+  hard-coded paths.
+
 ## 0.1.2 - 2026-01-12
 
 [dxm 0.2.0]
