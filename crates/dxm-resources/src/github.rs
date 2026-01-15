@@ -102,3 +102,38 @@ where
         Ok(None)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[should_panic = "InvalidLink"]
+    fn resolve_returns_error_for_invalid_link() {
+        resolve_download_url(&Client::new(), "/github.com/").unwrap();
+    }
+
+    #[test]
+    #[should_panic = "NoAuthor"]
+    fn resolve_returns_error_for_no_author() {
+        resolve_download_url(&Client::new(), "https://github.com").unwrap();
+    }
+
+    #[test]
+    #[should_panic = "NoAuthor"]
+    fn resolve_returns_error_for_empty_author() {
+        resolve_download_url(&Client::new(), "https://github.com/").unwrap();
+    }
+
+    #[test]
+    #[should_panic = "NoName"]
+    fn resolve_returns_error_for_no_repository() {
+        resolve_download_url(&Client::new(), "https://github.com/example").unwrap();
+    }
+
+    #[test]
+    #[should_panic = "NoName"]
+    fn resolve_returns_error_for_empty_repository() {
+        resolve_download_url(&Client::new(), "https://github.com/example/").unwrap();
+    }
+}

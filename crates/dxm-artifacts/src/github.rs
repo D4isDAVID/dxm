@@ -34,9 +34,8 @@ where
     let version = version.as_ref();
 
     log::trace!("getting github tag ref");
-    let ref_url = GITHUB_TAG_REF_API_URL.replace("{version}", version);
     let github_ref = client
-        .get(ref_url)
+        .get(tag_api_url(version))
         .send()?
         .error_for_status()?
         .json::<Ref>()?;
@@ -50,4 +49,24 @@ where
         .json::<Tag>()?;
 
     Ok(github_tag.object.sha)
+}
+
+fn tag_api_url<S>(version: S) -> String
+where
+    S: AsRef<str>,
+{
+    GITHUB_TAG_REF_API_URL.replace("{version}", version.as_ref())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn returns_tag_api_url() {
+        assert_eq!(
+            tag_api_url("1234"),
+            "https://api.github.com/repos/citizenfx/fivem/git/ref/tags/v1.0.0.1234"
+        );
+    }
 }

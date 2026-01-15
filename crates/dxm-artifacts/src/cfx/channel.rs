@@ -2,8 +2,14 @@ use std::{error::Error, fmt::Display, str::FromStr};
 
 use serde::{Deserialize, Serialize, de::Visitor};
 
+pub const CFX_CRITICAL: &str = "critical";
+pub const CFX_RECOMMENDED: &str = "recommended";
+pub const CFX_OPTIONAL: &str = "optional";
+pub const CFX_LATEST: &str = "latest";
+pub const JG_LATEST: &str = "latest-jg";
+
 /// The possible FXServer installation update channels.
-#[derive(Default, Clone, Copy, PartialEq, Eq)]
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ArtifactsChannel {
     Critical,
     Recommended,
@@ -33,11 +39,11 @@ impl FromStr for ArtifactsChannel {
 
     fn from_str(channel: &str) -> Result<Self, Self::Err> {
         match channel {
-            "critical" => Ok(Self::Critical),
-            "recommended" => Ok(Self::Recommended),
-            "optional" => Ok(Self::Optional),
-            "latest" => Ok(Self::Latest),
-            "latest-jg" => Ok(Self::LatestJg),
+            CFX_CRITICAL => Ok(Self::Critical),
+            CFX_RECOMMENDED => Ok(Self::Recommended),
+            CFX_OPTIONAL => Ok(Self::Optional),
+            CFX_LATEST => Ok(Self::Latest),
+            JG_LATEST => Ok(Self::LatestJg),
             _ => Err(ParseArtifactsChannelError {
                 channel: channel.to_owned(),
             }),
@@ -48,11 +54,11 @@ impl FromStr for ArtifactsChannel {
 impl Display for ArtifactsChannel {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let str = match self {
-            ArtifactsChannel::Critical => "critical",
-            ArtifactsChannel::Recommended => "recommended",
-            ArtifactsChannel::Optional => "optional",
-            ArtifactsChannel::Latest => "latest",
-            ArtifactsChannel::LatestJg => "latest-jg",
+            ArtifactsChannel::Critical => CFX_CRITICAL,
+            ArtifactsChannel::Recommended => CFX_RECOMMENDED,
+            ArtifactsChannel::Optional => CFX_OPTIONAL,
+            ArtifactsChannel::Latest => CFX_LATEST,
+            ArtifactsChannel::LatestJg => JG_LATEST,
         };
 
         write!(f, "{str}")?;
@@ -84,11 +90,11 @@ impl Visitor<'_> for ChannelVisitor {
         E: serde::de::Error,
     {
         match v {
-            "critical" => Ok(ArtifactsChannel::Critical),
-            "recommended" => Ok(ArtifactsChannel::Recommended),
-            "optional" => Ok(ArtifactsChannel::Optional),
-            "latest" => Ok(ArtifactsChannel::Latest),
-            "latest-jg" => Ok(ArtifactsChannel::LatestJg),
+            CFX_CRITICAL => Ok(ArtifactsChannel::Critical),
+            CFX_RECOMMENDED => Ok(ArtifactsChannel::Recommended),
+            CFX_OPTIONAL => Ok(ArtifactsChannel::Optional),
+            CFX_LATEST => Ok(ArtifactsChannel::Latest),
+            JG_LATEST => Ok(ArtifactsChannel::LatestJg),
             _ => Err(E::custom("invalid artifacts channel")),
         }
     }
@@ -107,5 +113,44 @@ impl<'de> Deserialize<'de> for ArtifactsChannel {
         D: serde::Deserializer<'de>,
     {
         deserializer.deserialize_str(ChannelVisitor)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_returns_value_when_valid() {
+        assert_eq!(
+            ArtifactsChannel::from_str("latest-jg").unwrap(),
+            ArtifactsChannel::LatestJg
+        );
+    }
+
+    #[test]
+    #[should_panic = "ParseArtifactsChannelError"]
+    fn parse_returns_error_when_invalid() {
+        ArtifactsChannel::from_str("").unwrap();
+    }
+
+    #[test]
+    fn visitor_returns_value_when_valid() {
+        let visitor = ChannelVisitor {};
+
+        assert_eq!(
+            visitor
+                .visit_str::<serde::de::value::Error>("latest-jg")
+                .unwrap(),
+            ArtifactsChannel::LatestJg
+        );
+    }
+
+    #[test]
+    #[should_panic = "invalid artifacts channel"]
+    fn visitor_returns_error_when_invalid() {
+        let visitor = ChannelVisitor {};
+
+        visitor.visit_str::<serde::de::value::Error>("").unwrap();
     }
 }

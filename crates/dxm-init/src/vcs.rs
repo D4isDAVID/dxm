@@ -28,7 +28,7 @@ const DATA_GITIGNORE: &str = "\
 ";
 
 /// The possible version control systems to use in servers.
-#[derive(Default, Clone)]
+#[derive(Default, Debug, PartialEq, Eq, Clone)]
 pub enum VcsOption {
     #[default]
     None,
@@ -84,5 +84,21 @@ impl VcsOption {
                 Ok(())
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_returns_value_when_valid() {
+        assert_eq!(VcsOption::from_str("none").unwrap(), VcsOption::None);
+    }
+
+    #[test]
+    #[should_panic]
+    fn parse_returns_error_when_invalid() {
+        VcsOption::from_str("").unwrap();
     }
 }

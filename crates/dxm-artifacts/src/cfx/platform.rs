@@ -99,3 +99,16 @@ impl ArtifactsPlatform {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn returns_runtime_url() {
+        assert_eq!(
+            ArtifactsPlatform::Windows.runtime_url("1234", "abcd"),
+            "https://runtime.fivem.net/artifacts/fivem/build_server_windows/master/1234-abcd/server.zip"
+        );
+    }
+}

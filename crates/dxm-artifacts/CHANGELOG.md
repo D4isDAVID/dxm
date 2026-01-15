@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+### Added
+
+- Constants for channels names.
+
+### Changed
+
+- Updated `channel::ArtifactsChannel` to derive from `Debug`.
+
 ## 0.1.2 - 2026-01-12
 
 [dxm 0.2.0]

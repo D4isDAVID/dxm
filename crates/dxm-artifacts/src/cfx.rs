@@ -83,3 +83,16 @@ pub fn versions(client: &Client, platform: &ArtifactsPlatform) -> reqwest::Resul
 fn changelogs_url(platform: &ArtifactsPlatform) -> String {
     CFX_SERVER_VERSIONS_API_URL.replace("{platform}", platform.changelogs_name())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn returns_changelogs_url() {
+        assert_eq!(
+            changelogs_url(&ArtifactsPlatform::Windows),
+            "https://changelogs-live.fivem.net/api/changelog/versions/win32/server"
+        );
+    }
+}

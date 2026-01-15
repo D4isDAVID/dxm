@@ -15,3 +15,6 @@ fs-err.workspace = true
 git2.workspace = true
 log.workspace = true
 serde.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
