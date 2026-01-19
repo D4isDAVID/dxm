@@ -3,7 +3,8 @@
 > [!NOTE]
 > This project is in active development. Expect issues and breaking changes.
 
-A manager for FXServer artifacts & resources.
+dxm (**D**4's F**X**Server **M**anager) is a CLI tool for managing FXServer
+artifacts & resources.
 
 ## Support
 
@@ -14,13 +15,13 @@ For questions or general support, use [GitHub Discussions] or join the
 
 ### Artifacts Management
 
-dxm can automatically install and update new artifacts for you.
-Supports JG Scripts' [Artifacts DB]!
+Install and update FXServer artifacts via dxm.
+Supports JG Scripts [Artifacts DB].
 
 ### Resource Management
 
-dxm can automatically install and update server resources for you.
-Currently supports GitHub and direct download URLs.
+Install and update third-party resources via dxm.
+Currently supports GitHub repositories and direct download URLs.
 
 ### Planned
 
