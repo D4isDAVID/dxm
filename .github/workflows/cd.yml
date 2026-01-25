@@ -19,8 +19,7 @@ jobs:
           - type: linux-x64
             os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-
-    name: Publish Artifact (${{ matrix.type }})
+    name: Upload Artifact (${{ matrix.type }})
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
@@ -36,51 +35,37 @@ jobs:
         run: |
           cargo build --verbose --locked --release
 
-      - name: Post-build
-        id: postbuild
-        shell: bash
-        run: |
-          name="dxm-${{ matrix.type }}"
-
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            name="$name.exe"
-            mv "./target/release/dxm.exe" "./$name"
-          else
-            mv "./target/release/dxm" "./$name"
-          fi
-
-          echo "name=$name" >> $GITHUB_OUTPUT
-
       - name: Upload artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
-          name: ${{ steps.postbuild.outputs.name }}
-          path: ./${{ steps.postbuild.outputs.name }}
+          name: dxm-${{ matrix.type }}
+          path: ./target/release/dxm${{ runner.os == 'Windows' && '.exe' || '' }}
 
   release:
     name: Draft Release
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     needs: artifact
     if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
+    permissions:
+      contents: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
       - name: Download archives
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
 
       - name: Archive
         shell: bash
         run: |
           version="${{ github.ref_name }}"
 
-          mv -vfT "dxm-windows-x64.exe/dxm-windows-x64.exe" "dxm.exe"
-          zip "dxm-$version-windows-x64.zip" "dxm.exe"
-
-          mv -vfT "dxm-linux-x64/dxm-linux-x64" "dxm"
-          tar -czvf "dxm-$version-linux-x64.tar.gz" "dxm"
+          for file in *; do
+            pushd "$file"
+            if [[ "$file" == *"-windows-"* ]]; then
+              zip "../dxm-$version-${file:4}.zip" "dxm.exe"
+            else
+              tar -czvf "../dxm-$version-${file:4}.tar.gz" "dxm"
+            fi
+            popd
+          done
 
       - name: Draft release
         uses: softprops/action-gh-release@v2
@@ -92,9 +77,10 @@ jobs:
             ./*.zip
             ./*.tar.gz
 
-  crate:
-    name: Publish Crate
+  crates:
+    name: Publish Crates
     runs-on: ubuntu-latest
+    needs: release
     if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
     steps:
       - name: Checkout repository
