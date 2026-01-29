@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+## 0.2.0 - 2026-01-29
+
+[dxm 0.2.1]
+
 ### Changed
 
 - **Breaking:** updated `github::resolve_download_url` to return `None` given a
@@ -30,4 +34,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial release.
 
 [dxm unreleased]: https://github.com/D4isDAVID/dxm/commits/main/crates/dxm-resources
+[dxm 0.2.1]: https://github.com/D4isDAVID/dxm/commits/v0.2.1/crates/dxm-resources
 [dxm 0.2.0]: https://github.com/D4isDAVID/dxm/commits/v0.2.0/crates/dxm-resources

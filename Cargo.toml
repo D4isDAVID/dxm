@@ -18,11 +18,11 @@ include = [
 [workspace.dependencies]
 clap = { version = "4.5.54", features = ["cargo", "env"] }
 dirs = "6.0.0"
-dxm-artifacts = { path = "./crates/dxm-artifacts", version = "0.1.2" }
+dxm-artifacts = { path = "./crates/dxm-artifacts", version = "0.2.0" }
 dxm-home = { path = "./crates/dxm-home", version = "0.1.2" }
-dxm-init = { path = "./crates/dxm-init", version = "0.1.2" }
-dxm-manifest = { path = "./crates/dxm-manifest", version = "0.2.0" }
-dxm-resources = { path = "./crates/dxm-resources", version = "0.1.0" }
+dxm-init = { path = "./crates/dxm-init", version = "0.2.0" }
+dxm-manifest = { path = "./crates/dxm-manifest", version = "0.3.0" }
+dxm-resources = { path = "./crates/dxm-resources", version = "0.2.0" }
 fern = "0.7.1"
 flate2 = "1.1.5"
 fs-err = "3.2.2"
@@ -41,11 +41,11 @@ zip = { version = "7.0.0", features = ["deflate"], default-features = false }
 
 [package]
 name = "dxm"
-version = "0.2.0"
+version = "0.2.1"
 authors.workspace = true
 edition.workspace = true
 rust-version.workspace = true
-description = "A CLI tool for managing FXServer artifacts & resources."
+description = "CLI tool for managing FXServer artifacts & resources."
 repository.workspace = true
 license.workspace = true
 keywords = ["fivem", "redm", "fxserver", "cfx", "citizenfx"]
