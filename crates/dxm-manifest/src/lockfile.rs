@@ -1,7 +1,7 @@
 //! Contains structures for the lockfile used by dxm.
 
 use std::{
-    collections::HashMap,
+    collections::BTreeMap,
     error::Error,
     path::{Path, PathBuf},
 };
@@ -23,12 +23,12 @@ pub struct Lockfile {
 
     /// The download URLs for the third-party FXServer resources.
     #[serde(default)]
-    resource_urls: HashMap<String, String>,
+    resource_urls: BTreeMap<String, String>,
 }
 
 impl Lockfile {
     /// Constructs and returns a new `Lockfile` instance.
-    pub fn new(artifact_version: String, resource_urls: HashMap<String, String>) -> Self {
+    pub fn new(artifact_version: String, resource_urls: BTreeMap<String, String>) -> Self {
         Self {
             artifact_version: Some(artifact_version),
             resource_urls,
