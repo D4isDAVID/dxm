@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+### Fixed
+
+- `github::resolve_download_url` incorrectly resolving
+  `github.com/author/repo/archive` URLs.
+
 ## 0.2.0 - 2026-01-29
 
 [dxm 0.2.1]

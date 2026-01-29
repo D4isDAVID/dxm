@@ -85,6 +85,10 @@ where
             link_data
         };
 
+        if link_type == &"archive" {
+            return Ok(Some(url.into()));
+        }
+
         let result = if link_type.is_empty()
             || link_data.is_empty()
             || (is_release && release_data.is_empty())
