@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `github::resolve_download_url` to return an error with an empty `github.com`
   string without an ending slash.
+- `github::api::get_default_branch_archive_url` returning the default branch
+  name rather than the archive URL.
 
 ## 0.1.0 - 2026-01-12
 

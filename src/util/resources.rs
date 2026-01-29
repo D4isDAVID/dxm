@@ -61,8 +61,9 @@ where
         let resource_path = base_path.join(resource_name);
 
         let url = dxm_resources::resolve_download_url(client, url)?;
-        let source_url = sourcefile::read(base_path.join(resource_name))?;
+        log::debug!("resolved resource url to {}", url);
 
+        let source_url = sourcefile::read(base_path.join(resource_name))?;
         if source_url.is_some_and(|u| u == url) {
             log::info!("resource {} already installed", resource_name);
 
@@ -108,6 +109,8 @@ where
         let resource_path = base_path.join(resource_name);
 
         let url = dxm_resources::resolve_download_url(client, url)?;
+        log::debug!("resolved resource url to {}", url);
+
         let lockfile_updated = lockfile
             .get_resource_url(resource_name)
             .is_some_and(|u| u == url);

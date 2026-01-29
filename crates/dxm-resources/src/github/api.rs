@@ -19,6 +19,7 @@ pub struct GithubReleaseAsset {
 
 #[derive(Deserialize)]
 pub struct GithubRepository {
+    full_name: String,
     default_branch: String,
 }
 
@@ -63,7 +64,7 @@ where
         .error_for_status()?
         .json::<GithubRepository>()?;
 
-    Ok(repo.default_branch)
+    Ok(branch_archive_url(repo.full_name, repo.default_branch))
 }
 
 pub fn get_branch_or_commit_archive_url<R, S>(
