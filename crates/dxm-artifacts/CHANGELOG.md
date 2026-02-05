@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+### Changed
+
+- Updated dependencies.
+
 ## 0.2.0 - 2026-01-29
 
 [dxm 0.2.1]
