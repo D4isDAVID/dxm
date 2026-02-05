@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+## 0.4.0 - 2026-02-05
+
+[dxm 0.2.3]
+
 ### Changed
 
 - **Breaking:** use `BTreeMap` instead of `HashMap` for `Lockfile` resources to
@@ -70,6 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial release.
 
 [dxm unreleased]: https://github.com/D4isDAVID/dxm/commits/main/crates/dxm-manifest
+[dxm 0.2.3]: https://github.com/D4isDAVID/dxm/commits/v0.2.3/crates/dxm-manifest
 [dxm 0.2.1]: https://github.com/D4isDAVID/dxm/commits/v0.2.1/crates/dxm-manifest
 [dxm 0.2.0]: https://github.com/D4isDAVID/dxm/commits/v0.2.0/crates/dxm-manifest
 [dxm 0.1.2]: https://github.com/D4isDAVID/dxm/commits/v0.1.2/crates/dxm-manifest

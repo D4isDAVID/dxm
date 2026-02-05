@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+## 0.2.2 - 2026-02-05
+
+[dxm 0.2.3]
+
 ### Changed
 
 - Updated dependencies.
@@ -47,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial release.
 
 [dxm unreleased]: https://github.com/D4isDAVID/dxm/commits/main/crates/dxm-resources
+[dxm 0.2.3]: https://github.com/D4isDAVID/dxm/commits/v0.2.3/crates/dxm-resources
 [dxm 0.2.2]: https://github.com/D4isDAVID/dxm/commits/v0.2.2/crates/dxm-resources
 [dxm 0.2.1]: https://github.com/D4isDAVID/dxm/commits/v0.2.1/crates/dxm-resources
 [dxm 0.2.0]: https://github.com/D4isDAVID/dxm/commits/v0.2.0/crates/dxm-resources
