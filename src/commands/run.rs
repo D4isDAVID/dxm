@@ -20,7 +20,8 @@ pub fn cli() -> Command {
             Arg::new("server-args")
                 .help("Extra args passed to FXServer")
                 .index(2)
-                .last(true),
+                .last(true)
+                .num_args(..),
         )
 }
 
