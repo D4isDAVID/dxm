@@ -3,7 +3,7 @@
 > [!NOTE]
 > This project is in active development. Expect issues and breaking changes.
 
-dxm (**D**4's F**X**Server **M**anager) is a CLI tool for managing FXServer
+**D**4's F**X**Server **M**anager (dxm) is a CLI tool for managing FXServer
 artifacts & resources.
 
 ## Support
@@ -43,7 +43,7 @@ If you are interested in contributing to this project, read the
 
 ## License
 
-This project's source code © 2025 David Malchin is licensed under the
+This project's source code © 2024 David Malchin is licensed under the
 **MIT License (MIT)** provided in the [LICENSE] file.
 
 [github discussions]: https://github.com/D4isDAVID/dxm/discussions
