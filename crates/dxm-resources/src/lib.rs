@@ -1,61 +1,43 @@
 //! A crate for installing third-party resources for FXServer.
 
-use std::{error::Error, io::Write, path::Path};
+use std::{error::Error, path::Path};
 
 use fs_extra::dir::{CopyOptions, move_dir};
 use reqwest::blocking::Client;
-use tempfile::{NamedTempFile, TempDir};
-use zip::{ZipArchive, read::root_dir_common_filter};
+use tempfile::TempDir;
 
-mod github;
+use crate::download::DownloadSource;
+
+mod download;
+mod resolve;
 
 const ROOT_GITIGNORE: &str = "\
 *
 ";
 
-pub fn resolve_download_url<S>(client: &Client, url: S) -> Result<String, Box<dyn Error>>
+pub fn resolve<'a, S>(
+    client: &'a Client,
+    download_url: S,
+) -> Result<DownloadSource<'a>, Box<dyn Error>>
 where
-    S: Into<String>,
+    S: AsRef<str>,
 {
-    let url = url.into();
+    let download_url = download_url.as_ref();
 
-    if let Some(github_url) = github::resolve_download_url(client, &url)? {
-        Ok(github_url)
-    } else {
-        Ok(url)
-    }
+    resolve::download_url(client, download_url)
 }
 
 /// Downloads and installs the given archive URL to the given directory path.
 /// Returns the archive download URL.
-pub fn install<S, P, N>(
-    client: &Client,
-    download_url: S,
-    path: P,
-    nested_path: N,
-) -> Result<(), Box<dyn Error>>
+pub fn install<P, N>(source: &DownloadSource, path: P, nested_path: N) -> Result<(), Box<dyn Error>>
 where
-    S: AsRef<str>,
     P: AsRef<Path>,
     N: AsRef<Path>,
 {
-    let download_url = download_url.as_ref();
     let path = path.as_ref();
     let nested_path = nested_path.as_ref();
 
     fs_err::create_dir_all(path)?;
-
-    let mut file = NamedTempFile::with_suffix("dxm-resource-archive")?;
-    let bytes = client
-        .get(download_url)
-        .send()?
-        .error_for_status()?
-        .bytes()?;
-    file.write_all(&bytes)?;
-
-    log::debug!("extracting resource into {}", nested_path.display());
-    let dir = TempDir::with_suffix("dxm-resource")?;
-    ZipArchive::new(file.reopen()?)?.extract_unwrapped_root_dir(&dir, root_dir_common_filter)?;
 
     let copy_options = CopyOptions::new().content_only(true);
     let mut original_dir: Option<TempDir> = None;
@@ -66,14 +48,14 @@ where
         original_dir = Some(tempdir);
     }
 
-    let result = move_dir(dir.path().join(nested_path), path, &copy_options);
+    let result = source.download(path, nested_path);
     if result.is_err()
         && let Some(original_dir) = original_dir
     {
         move_dir(original_dir, path, &copy_options)?;
     }
-    result?;
 
+    result?;
     fs_err::write(path.join(".gitignore"), ROOT_GITIGNORE)?;
 
     Ok(())

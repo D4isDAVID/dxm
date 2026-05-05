@@ -60,8 +60,9 @@ where
         let nested_path = resource.nested_path();
         let resource_path = base_path.join(resource_name);
 
-        let url = dxm_resources::resolve_download_url(client, url)?;
-        log::debug!("resolved resource url to {}", url);
+        let source = dxm_resources::resolve(client, url)?;
+        let url = source.url();
+        log::debug!("resolved resource url to {}", source);
 
         let source_url = sourcefile::read(base_path.join(resource_name))?;
         if source_url.is_some_and(|u| u == url) {
@@ -72,7 +73,7 @@ where
 
         log::info!("installing resource {}", resource_name);
 
-        dxm_resources::install(client, &url, &resource_path, nested_path)?;
+        dxm_resources::install(&source, &resource_path, nested_path)?;
 
         sourcefile::write(base_path.join(resource_name), &url)?;
         lockfile.set_resource_url(resource_name, url);
@@ -108,7 +109,8 @@ where
         let nested_path = resource.nested_path();
         let resource_path = base_path.join(resource_name);
 
-        let url = dxm_resources::resolve_download_url(client, url)?;
+        let source = dxm_resources::resolve(client, url)?;
+        let url = source.url();
         log::debug!("resolved resource url to {}", url);
 
         let lockfile_updated = lockfile
@@ -125,7 +127,7 @@ where
 
         log::info!("updating resource {}", resource_name);
 
-        dxm_resources::install(client, &url, &resource_path, nested_path)?;
+        dxm_resources::install(&source, &resource_path, nested_path)?;
 
         sourcefile::write(base_path.join(resource_name), &url)?;
         lockfile.set_resource_url(resource_name, url);
