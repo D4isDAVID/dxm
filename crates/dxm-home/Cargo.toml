@@ -22,4 +22,4 @@ tempfile.workspace = true
 zip.workspace = true
 
 [target.'cfg(windows)'.dependencies]
-winreg = "0.55.0"
+winreg.workspace = true
