@@ -17,4 +17,5 @@ reqwest = { workspace = true, features = ["json"] }
 serde.workspace = true
 serde_json.workspace = true
 tempfile.workspace = true
+url.workspace = true
 zip.workspace = true
