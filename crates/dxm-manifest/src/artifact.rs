@@ -9,7 +9,13 @@ use std::{
 pub use dxm_artifacts::cfx::{ArtifactsChannel, ArtifactsPlatform};
 use serde::{Deserialize, Serialize};
 
-use crate::util::relative_path;
+use crate::{
+    resource::Resource,
+    util::{add_and_fill_inline_table, relative_path},
+};
+
+pub const SYSTEM_RESOURCES: &str = "system_resources";
+pub const TXADMIN_MONITOR: &str = ".dxm-monitor-tx";
 
 static DEFAULT_PATH: LazyLock<PathBuf> = LazyLock::new(|| PathBuf::from("artifact"));
 static DEFAULT_CHANNEL: LazyLock<String> = LazyLock::new(|| ArtifactsChannel::LatestJg.to_string());
@@ -21,6 +27,8 @@ pub struct Artifact {
     path: Option<PathBuf>,
     /// The FXServer artifact version.
     version: Option<String>,
+    /// An optional third-party FXServer monitor.
+    monitor: Option<Resource>,
 }
 
 impl Default for Artifact {
@@ -28,6 +36,7 @@ impl Default for Artifact {
         Self {
             path: Some(DEFAULT_PATH.to_path_buf()),
             version: Some(DEFAULT_CHANNEL.to_string()),
+            monitor: None,
         }
     }
 }
@@ -58,11 +67,31 @@ impl Artifact {
     }
 
     /// Returns the installation's FXServer path appended to the given manifest file path.
-    pub fn exe<P>(&self, manifest_path: P, platform: ArtifactsPlatform) -> PathBuf
+    pub fn exe<P>(&self, manifest_path: P, platform: &ArtifactsPlatform) -> PathBuf
     where
         P: AsRef<Path>,
     {
         self.path(manifest_path).join(platform.exe_name())
+    }
+
+    /// Returns the installation's system_resources path appended to the given manifest file path.
+    pub fn system_resources<P>(&self, manifest_path: P, platform: &ArtifactsPlatform) -> PathBuf
+    where
+        P: AsRef<Path>,
+    {
+        platform
+            .citizen_dir(self.path(manifest_path))
+            .join(SYSTEM_RESOURCES)
+    }
+
+    /// Returns the installation's tx monitor path appended to the given manifest file path.
+    pub fn tx_monitor<P>(&self, manifest_path: P, platform: &ArtifactsPlatform) -> PathBuf
+    where
+        P: AsRef<Path>,
+    {
+        platform
+            .citizen_dir(self.path(manifest_path))
+            .join(TXADMIN_MONITOR)
     }
 
     /// Sets the installation's version.
@@ -84,9 +113,32 @@ impl Artifact {
         ArtifactsChannel::from_str(self.version()).ok()
     }
 
+    /// Sets the installation's FXServer monitor.
+    pub fn set_monitor(&mut self, monitor: Resource) {
+        self.monitor = Some(monitor);
+    }
+
+    /// Remove the installation's FXServer monitor.
+    pub fn remove_monitor(&mut self) {
+        self.monitor = None;
+    }
+
+    /// Returns the installation's FXServer monitor.
+    pub fn monitor(&self) -> Option<&Resource> {
+        self.monitor.as_ref()
+    }
+
     /// Fills out information about the installation inside the given TOML document.
     pub fn fill_toml_item(&self, item: &mut toml_edit::Item) {
         item["path"] = toml_edit::value(self.relative_path().to_string_lossy().into_owned());
         item["version"] = toml_edit::value(self.version());
+
+        if let Some(monitor) = self.monitor() {
+            add_and_fill_inline_table(item, "monitor", |i| monitor.fill_toml_item(i));
+        } else {
+            if let Some(t) = item.as_table_like_mut() {
+                t.remove("monitor");
+            }
+        }
     }
 }

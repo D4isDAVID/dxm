@@ -1,6 +1,6 @@
 use std::{
     io::{Read, Seek},
-    path::Path,
+    path::{Path, PathBuf},
 };
 
 use tempfile::NamedTempFile;
@@ -56,6 +56,19 @@ impl ArtifactsPlatform {
         match self {
             Self::Windows => "FXServer.exe",
             Self::Linux => "run.sh",
+        }
+    }
+
+    /// Appends the installation citizen directory of the platform to the given path and returns it.
+    pub fn citizen_dir<P>(&self, base: P) -> PathBuf
+    where
+        P: AsRef<Path>,
+    {
+        let base = base.as_ref();
+
+        match self {
+            Self::Windows => base.join("citizen"),
+            Self::Linux => base.join("alpine/opt/cfx-server/citizen"),
         }
     }
 

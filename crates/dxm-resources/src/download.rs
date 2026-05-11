@@ -21,7 +21,7 @@ impl<'a> Display for DownloadSource<'a> {
 impl<'a> DownloadSource<'a> {
     pub fn url(&self) -> &str {
         match self {
-            DownloadSource::Archive(_, url) => &url,
+            DownloadSource::Archive(_, url) => url,
         }
     }
 

@@ -1,8 +1,12 @@
 use std::{error::Error, path::Path};
 
 use dxm_artifacts::cfx::{ArtifactsChannel, ArtifactsPlatform};
-use dxm_manifest::{Manifest, lockfile::Lockfile, sourcefile};
+use dxm_manifest::{
+    Manifest, artifact::Artifact, lockfile::Lockfile, resource::Resource, sourcefile,
+};
 use reqwest::blocking::Client;
+
+pub const MONITOR_RESOURCE: &str = "monitor";
 
 pub fn install<P>(
     client: &Client,
@@ -50,6 +54,13 @@ where
     let artifact = &manifest.artifact;
     let artifact_path = artifact.path(&manifest_path);
 
+    let vacated_monitor = dxm_resources::VacatedDir::temp(
+        manifest
+            .artifact
+            .system_resources(manifest_path, platform)
+            .join(MONITOR_RESOURCE),
+    )?;
+
     let version = if let Some(channel) = artifact.channel() {
         log::info!("getting versions");
 
@@ -79,7 +90,116 @@ where
     sourcefile::write(artifact_path, version)?;
     lockfile.set_artifact_version(version);
 
+    if let Some(vacated_monitor) = vacated_monitor {
+        vacated_monitor.bring_back()?;
+    }
+
     log::info!("successfully updated artifact");
+
+    Ok(())
+}
+
+pub fn install_monitor<P>(
+    client: &Client,
+    manifest_path: P,
+    artifact: &Artifact,
+    platform: &ArtifactsPlatform,
+    resource: &Resource,
+    lockfile: &mut Lockfile,
+) -> Result<(), Box<dyn Error>>
+where
+    P: AsRef<Path>,
+{
+    let manifest_path = manifest_path.as_ref();
+
+    let resources_path = artifact.system_resources(manifest_path, platform);
+
+    let vacated_monitor = dxm_resources::VacatedDir::new(
+        resources_path.join(MONITOR_RESOURCE),
+        artifact.tx_monitor(manifest_path, platform),
+    )?;
+
+    let result = crate::util::resources::install_single(
+        client,
+        resources_path,
+        resource,
+        lockfile.monitor_url(),
+        MONITOR_RESOURCE,
+    );
+
+    if result.is_err()
+        && let Some(vacated_monitor) = vacated_monitor
+    {
+        vacated_monitor.bring_back()?;
+    }
+
+    let lock_url = result?;
+
+    if let Some(lock_url) = lock_url {
+        lockfile.set_monitor_url(lock_url);
+
+        log::info!("successfully installed third-party monitor");
+    }
+
+    Ok(())
+}
+
+pub fn update_monitor<P>(
+    client: &Client,
+    manifest_path: P,
+    artifact: &Artifact,
+    platform: &ArtifactsPlatform,
+    resource: &Resource,
+    lockfile: &mut Lockfile,
+) -> Result<(), Box<dyn Error>>
+where
+    P: AsRef<Path>,
+{
+    let manifest_path = manifest_path.as_ref();
+
+    let resources_path = artifact.system_resources(manifest_path, platform);
+
+    let lock_url = crate::util::resources::update_single(
+        client,
+        resources_path,
+        resource,
+        lockfile.monitor_url(),
+        MONITOR_RESOURCE,
+    )?;
+
+    if let Some(lock_url) = lock_url {
+        lockfile.set_monitor_url(lock_url);
+
+        log::info!("successfully updated third-party monitor");
+    }
+
+    Ok(())
+}
+
+pub fn remove_monitor<P>(
+    manifest_path: P,
+    artifact: &Artifact,
+    platform: &ArtifactsPlatform,
+    resource: &Resource,
+    lockfile: &mut Lockfile,
+) -> Result<(), Box<dyn Error>>
+where
+    P: AsRef<Path>,
+{
+    let manifest_path = manifest_path.as_ref();
+
+    let resources_path = artifact.system_resources(manifest_path, platform);
+
+    crate::util::resources::uninstall_single(&resources_path, resource, MONITOR_RESOURCE)?;
+
+    lockfile.remove_monitor_url();
+
+    dxm_resources::VacatedDir::new(
+        artifact.tx_monitor(manifest_path, platform),
+        resources_path.join(MONITOR_RESOURCE),
+    )?;
+
+    log::info!("successfully removed third-party monitor");
 
     Ok(())
 }

@@ -21,6 +21,9 @@ pub struct Lockfile {
     /// The version of the FXServer installation.
     artifact_version: Option<String>,
 
+    /// The download URL for the third-party FXServer monitor.
+    monitor_url: Option<String>,
+
     /// The download URLs for the third-party FXServer resources.
     #[serde(default)]
     resource_urls: BTreeMap<String, String>,
@@ -31,6 +34,7 @@ impl Lockfile {
     pub fn new(artifact_version: String, resource_urls: BTreeMap<String, String>) -> Self {
         Self {
             artifact_version: Some(artifact_version),
+            monitor_url: None,
             resource_urls,
         }
     }
@@ -44,6 +48,21 @@ impl Lockfile {
         S: Into<String>,
     {
         self.artifact_version = Some(artifact_version.into());
+    }
+
+    pub fn monitor_url(&self) -> Option<&str> {
+        self.monitor_url.as_deref()
+    }
+
+    pub fn set_monitor_url<S>(&mut self, monitor_url: S)
+    where
+        S: Into<String>,
+    {
+        self.monitor_url = Some(monitor_url.into());
+    }
+
+    pub fn remove_monitor_url(&mut self) {
+        self.monitor_url = None;
     }
 
     pub fn get_resource_url<S>(&self, resource_name: S) -> Option<&str>

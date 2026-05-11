@@ -32,6 +32,18 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let platform = ArtifactsPlatform::default();
 
     crate::util::artifacts::install(&client, &platform, &manifest_path, &manifest, &mut lockfile)?;
+
+    if let Some(monitor) = manifest.artifact.monitor() {
+        crate::util::artifacts::install_monitor(
+            &client,
+            &manifest_path,
+            &manifest.artifact,
+            &platform,
+            monitor,
+            &mut lockfile,
+        )?;
+    }
+
     crate::util::resources::install(&client, &manifest_path, &manifest, &mut lockfile)?;
 
     lockfile.write(manifest_path)?;

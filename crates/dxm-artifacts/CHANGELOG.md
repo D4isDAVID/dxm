@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+### Added
+
+- Citizen directory path for `ArtifactsPlatform`.
+
 ### Changed
 
 - Updated dependencies.

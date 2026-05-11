@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+### Added
+
+- `artifact::SYSTEM_RESOURCES` constant.
+- `artifact::TXADMIN_MONITOR` constant.
+- Optional third-party monitor in artifact and lockfile definitions.
+
 ### Changed
 
 - Updated dependencies.

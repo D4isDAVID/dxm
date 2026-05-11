@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+### Added
+
+- `VacatedDir` to move a directory to a different location to be later brought
+  back or deleted.
+
 ### Changed
 
 - Updated dependencies.

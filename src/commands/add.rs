@@ -74,14 +74,17 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     resources.insert(name.clone(), Resource::new(url, category, &nested_path));
 
     let client = crate::util::reqwest::client().build()?;
-
-    crate::util::resources::install_single(
+    let lock_url = crate::util::resources::install_single(
         &client,
-        &manifest_path,
-        &manifest,
-        &mut lockfile,
+        manifest.server.resources(&manifest_path),
+        &resources[name],
+        lockfile.get_resource_url(name),
         name,
     )?;
+
+    if let Some(lock_url) = lock_url {
+        lockfile.set_resource_url(name, lock_url);
+    }
 
     manifest.write_resources(&manifest_path)?;
     lockfile.write(&manifest_path)?;

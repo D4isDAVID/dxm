@@ -9,6 +9,7 @@ pub mod add;
 pub mod artifacts;
 pub mod init;
 pub mod install;
+pub mod monitor;
 pub mod new;
 pub mod remove;
 pub mod run;
@@ -67,6 +68,7 @@ pub fn cli() -> Command {
         .subcommand(artifacts::cli())
         .subcommand(init::cli())
         .subcommand(install::cli())
+        .subcommand(monitor::cli())
         .subcommand(new::cli())
         .subcommand(remove::cli())
         .subcommand(run::cli())
@@ -85,6 +87,7 @@ pub fn execute(args: &ArgMatches, options: &ExecuteOptions) -> Result<(), Box<dy
         Some(("artifacts", m)) => artifacts::execute(m)?,
         Some(("init", m)) => init::execute(m)?,
         Some(("install", m)) => install::execute(m)?,
+        Some(("monitor", m)) => monitor::execute(m)?,
         Some(("new", m)) => new::execute(m)?,
         Some(("remove", m)) => remove::execute(m)?,
         Some(("run", m)) => run::execute(m)?,

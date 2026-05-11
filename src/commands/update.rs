@@ -9,7 +9,7 @@ use dxm_manifest::lockfile::Lockfile;
 /// The command structure.
 pub fn cli() -> Command {
     Command::new("update")
-        .about("Update FXServer and third-party resources")
+        .about("Update FXServer, third-party resources and monitor")
         .arg(
             Arg::new("manifest-path")
                 .help("The path to a directory with a dxm manifest")
@@ -18,17 +18,17 @@ pub fn cli() -> Command {
                 .default_value("."),
         )
         .arg(
-            Arg::new("all")
-                .help("Update the FXServer installation and third-party resources")
-                .long("all")
-                .short('a')
-                .action(ArgAction::SetTrue),
-        )
-        .arg(
             Arg::new("resource")
-                .help("The third-party resource to update")
+                .help("Update only the specified third-party resource")
                 .long("resource")
                 .short('r'),
+        )
+        .arg(
+            Arg::new("monitor")
+                .help("Update only the third-party FXServer monitor")
+                .long("monitor")
+                .short('m')
+                .action(ArgAction::SetTrue),
         )
 }
 
@@ -44,28 +44,19 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let client = crate::util::reqwest::github_client().build()?;
     let platform = ArtifactsPlatform::default();
 
-    if args.get_flag("all") {
-        crate::util::artifacts::update(
-            &client,
-            &platform,
-            &manifest_path,
-            &manifest,
-            &mut lockfile,
-        )?;
-        crate::util::resources::update(&client, &manifest_path, &manifest, &mut lockfile)?;
-
-        lockfile.write(manifest_path)?;
-
-        log::info!("successfully updated resources");
-    } else if let Some(resource_name) = args.get_one::<String>("resource") {
-        if manifest.resources.contains_key(resource_name) {
-            crate::util::resources::update_single(
+    if let Some(resource_name) = args.get_one::<String>("resource") {
+        if let Some(resource) = manifest.resources.get(resource_name) {
+            let lock_url = crate::util::resources::update_single(
                 &client,
-                &manifest_path,
-                &manifest,
-                &mut lockfile,
+                manifest.server.resources(&manifest_path),
+                resource,
+                lockfile.get_resource_url(resource_name),
                 resource_name,
             )?;
+
+            if let Some(lock_url) = lock_url {
+                lockfile.set_resource_url(resource_name, lock_url);
+            }
 
             lockfile.write(manifest_path)?;
 
@@ -73,8 +64,44 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         } else {
             log::error!("no such resource {}", resource_name);
         }
+    } else if args.get_flag("monitor") {
+        if let Some(monitor) = manifest.artifact.monitor() {
+            crate::util::artifacts::update_monitor(
+                &client,
+                manifest_path,
+                &manifest.artifact,
+                &platform,
+                monitor,
+                &mut lockfile,
+            )?;
+        } else {
+            log::error!("no third-party monitor installed");
+        }
     } else {
-        log::error!("specify either --resource or --all to update");
+        crate::util::artifacts::update(
+            &client,
+            &platform,
+            &manifest_path,
+            &manifest,
+            &mut lockfile,
+        )?;
+
+        if let Some(monitor) = manifest.artifact.monitor() {
+            crate::util::artifacts::update_monitor(
+                &client,
+                &manifest_path,
+                &manifest.artifact,
+                &platform,
+                monitor,
+                &mut lockfile,
+            )?;
+        }
+
+        crate::util::resources::update(&client, &manifest_path, &manifest, &mut lockfile)?;
+
+        lockfile.write(manifest_path)?;
+
+        log::info!("successfully updated resources");
     }
 
     Ok(())

@@ -9,9 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [unreleased diff]
 
+### Added
+
+- `dxm monitor install` to install a third-party monitor.
+- `dxm monitor remove` to remove the third-party monitor if exists.
+- `dxm update --monitor` to update the third-party monitor if exists.
+
 ### Changed
 
 - Updated dependencies.
+- Changed `dxm update` without arguments to update everything by default.
+- Updated `dxm install` to install the third-party monitor if exists.
+- Updated `dxm update` to update the third-party monitor if exists.
+
+### Removed
+
+- **Breaking:** `dxm update --all` - use `dxm update` instead.
 
 ## [0.2.4] - 2026-03-07
 

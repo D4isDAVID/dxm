@@ -1,6 +1,6 @@
 use std::{error::Error, fs, path::Path};
 
-use dxm_manifest::{Manifest, lockfile::Lockfile, sourcefile};
+use dxm_manifest::{Manifest, lockfile::Lockfile, resource::Resource, sourcefile};
 use reqwest::blocking::Client;
 
 pub fn install<P>(
@@ -12,8 +12,20 @@ pub fn install<P>(
 where
     P: AsRef<Path>,
 {
-    for resource_name in manifest.resources.keys() {
-        install_single(client, &manifest_path, manifest, lockfile, resource_name)?;
+    let resources_path = manifest.server.resources(manifest_path);
+
+    for (resource_name, resource) in manifest.resources.iter() {
+        let lock_url = install_single(
+            client,
+            &resources_path,
+            resource,
+            lockfile.get_resource_url(resource_name),
+            resource_name,
+        )?;
+
+        if let Some(lock_url) = lock_url {
+            lockfile.set_resource_url(resource_name, lock_url);
+        }
     }
 
     Ok(())
@@ -28,8 +40,20 @@ pub fn update<P>(
 where
     P: AsRef<Path>,
 {
-    for resource_name in manifest.resources.keys() {
-        update_single(client, &manifest_path, manifest, lockfile, resource_name)?;
+    let resources_path = manifest.server.resources(manifest_path);
+
+    for (resource_name, resource) in manifest.resources.iter() {
+        let lock_url = update_single(
+            client,
+            &resources_path,
+            resource,
+            lockfile.get_resource_url(resource_name),
+            resource_name,
+        )?;
+
+        if let Some(lock_url) = lock_url {
+            lockfile.set_resource_url(resource_name, lock_url);
+        }
     }
 
     Ok(())
@@ -37,28 +61,24 @@ where
 
 pub fn install_single<P, S>(
     client: &Client,
-    manifest_path: P,
-    manifest: &Manifest,
-    lockfile: &mut Lockfile,
+    resources_path: P,
+    resource: &Resource,
+    lock_url: Option<&str>,
     resource_name: S,
-) -> Result<(), Box<dyn Error>>
+) -> Result<Option<String>, Box<dyn Error>>
 where
     P: AsRef<Path>,
     S: AsRef<str>,
 {
-    let manifest_path = manifest_path.as_ref();
+    let resources_path = resources_path.as_ref();
     let resource_name = resource_name.as_ref();
 
-    let resource = manifest
-        .resources
-        .get(resource_name)
-        .unwrap_or_else(|| panic!("no such resource {}", resource_name));
-
-    if let Some(url) = lockfile.get_resource_url(resource_name).or(resource.url()) {
-        let resources_path = &manifest.server.resources(manifest_path);
+    if let Some(url) = lock_url.or(resource.url()) {
         let base_path = resource.category(resources_path);
         let nested_path = resource.nested_path();
         let resource_path = base_path.join(resource_name);
+
+        log::debug!("resolving resource url {}", url);
 
         let source = dxm_resources::resolve(client, url)?;
         let url = source.url();
@@ -68,43 +88,37 @@ where
         if source_url.is_some_and(|u| u == url) {
             log::info!("resource {} already installed", resource_name);
 
-            return Ok(());
+            return Ok(None);
         }
 
         log::info!("installing resource {}", resource_name);
 
         dxm_resources::install(&source, &resource_path, nested_path)?;
+        sourcefile::write(base_path.join(resource_name), url)?;
 
-        sourcefile::write(base_path.join(resource_name), &url)?;
-        lockfile.set_resource_url(resource_name, url);
+        Ok(Some(url.into()))
     } else {
         log::warn!("no download url found for {}", resource_name);
-    };
 
-    Ok(())
+        Ok(None)
+    }
 }
 
 pub fn update_single<P, S>(
     client: &Client,
-    manifest_path: P,
-    manifest: &Manifest,
-    lockfile: &mut Lockfile,
+    resources_path: P,
+    resource: &Resource,
+    lock_url: Option<&str>,
     resource_name: S,
-) -> Result<(), Box<dyn Error>>
+) -> Result<Option<String>, Box<dyn Error>>
 where
     P: AsRef<Path>,
     S: AsRef<str>,
 {
-    let manifest_path = manifest_path.as_ref();
+    let resources_path = resources_path.as_ref();
     let resource_name = resource_name.as_ref();
 
-    let resource = manifest
-        .resources
-        .get(resource_name)
-        .unwrap_or_else(|| panic!("no such resource {}", resource_name));
-
     if let Some(url) = resource.url() {
-        let resources_path = &manifest.server.resources(manifest_path);
         let base_path = resource.category(resources_path);
         let nested_path = resource.nested_path();
         let resource_path = base_path.join(resource_name);
@@ -113,58 +127,46 @@ where
         let url = source.url();
         log::debug!("resolved resource url to {}", url);
 
-        let lockfile_updated = lockfile
-            .get_resource_url(resource_name)
-            .is_some_and(|u| u == url);
+        let lockfile_updated = lock_url.is_some_and(|u| u == url);
         let sourcefile_updated =
             sourcefile::read(base_path.join(resource_name))?.is_some_and(|u| u == url);
 
         if lockfile_updated && sourcefile_updated {
             log::info!("resource {} already updated", resource_name);
 
-            return Ok(());
+            return Ok(None);
         }
 
         log::info!("updating resource {}", resource_name);
 
         dxm_resources::install(&source, &resource_path, nested_path)?;
+        sourcefile::write(base_path.join(resource_name), url)?;
 
-        sourcefile::write(base_path.join(resource_name), &url)?;
-        lockfile.set_resource_url(resource_name, url);
+        Ok(Some(url.into()))
     } else {
         log::warn!("no download url found for {}", resource_name);
-    };
-
-    Ok(())
+        Ok(None)
+    }
 }
 
 pub fn uninstall_single<P, S>(
-    manifest_path: P,
-    manifest: &Manifest,
-    lockfile: &mut Lockfile,
+    resources_path: P,
+    resource: &Resource,
     resource_name: S,
 ) -> Result<(), Box<dyn Error>>
 where
     P: AsRef<Path>,
     S: AsRef<str>,
 {
-    let manifest_path = manifest_path.as_ref();
+    let resources_path = resources_path.as_ref();
     let resource_name = resource_name.as_ref();
 
-    let resource = manifest
-        .resources
-        .get(resource_name)
-        .unwrap_or_else(|| panic!("no such resource {}", resource_name));
-
-    let resources_path = &manifest.server.resources(manifest_path);
     let base_path = resource.category(resources_path);
     let resource_path = base_path.join(resource_name);
 
     log::info!("uninstalling resource {}", resource_name);
 
     fs::remove_dir_all(resource_path)?;
-
-    lockfile.remove_resource_url(resource_name);
 
     Ok(())
 }
