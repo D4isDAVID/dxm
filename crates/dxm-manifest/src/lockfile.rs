@@ -30,15 +30,6 @@ pub struct Lockfile {
 }
 
 impl Lockfile {
-    /// Constructs and returns a new `Lockfile` instance.
-    pub fn new(artifact_version: String, resource_urls: BTreeMap<String, String>) -> Self {
-        Self {
-            artifact_version: Some(artifact_version),
-            monitor_url: None,
-            resource_urls,
-        }
-    }
-
     pub fn artifact_version(&self) -> Option<&str> {
         self.artifact_version.as_deref()
     }
