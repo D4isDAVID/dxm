@@ -345,8 +345,10 @@ dependencies = [
 name = "dxm-resources"
 version = "0.2.3"
 dependencies = [
+ "dirs",
  "fs-err",
  "fs_extra",
+ "git2",
  "log",
  "reqwest",
  "serde",

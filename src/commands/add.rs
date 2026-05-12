@@ -2,7 +2,7 @@
 
 use std::{error::Error, path::PathBuf};
 
-use clap::{Arg, ArgMatches, Command};
+use clap::{Arg, ArgGroup, ArgMatches, Command};
 use dxm_manifest::{lockfile::Lockfile, resource::Resource};
 
 /// The command structure.
@@ -40,6 +40,16 @@ pub fn cli() -> Command {
                 .long("nested-path")
                 .short('n'),
         )
+        .arg(
+            Arg::new("git")
+                .help("Install the resource from a Git repository")
+                .long("git")
+                .short('g')
+                .num_args(0..=1)
+                .value_name("rev")
+                .default_missing_value(""),
+        )
+        .group(ArgGroup::new("source").arg("git"))
 }
 
 /// The code ran when using the command.
@@ -59,6 +69,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         .filter(|n| !n.contains('.'))
         .map(PathBuf::from)
         .unwrap_or(PathBuf::from(""));
+    let git_rev = args.get_one::<String>("git");
 
     let (manifest_path, mut manifest) = crate::util::manifest::find(manifest_path)?;
     let mut lockfile = Lockfile::read(&manifest_path)?;
@@ -71,7 +82,18 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         return Ok(());
     }
 
-    resources.insert(name.clone(), Resource::new(url, category, &nested_path));
+    if let Some(git_rev) = git_rev {
+        resources.insert(
+            name.to_owned(),
+            Resource::new(
+                dxm_resources::format_git_url(url, git_rev),
+                category,
+                &nested_path,
+            ),
+        );
+    } else {
+        resources.insert(name.to_owned(), Resource::new(url, category, &nested_path));
+    }
 
     let client = crate::util::reqwest::client().build()?;
     let lock_url = crate::util::resources::install_single(

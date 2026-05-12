@@ -35,7 +35,11 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let mut lockfile = Lockfile::read(&manifest_path)?;
 
     if let Some(resource) = manifest.resources.get(name) {
-        crate::util::resources::uninstall_single(&manifest_path, resource, name)?;
+        crate::util::resources::uninstall_single(
+            &manifest.server.resources(&manifest_path),
+            resource,
+            name,
+        )?;
 
         lockfile.remove_resource_url(name);
 

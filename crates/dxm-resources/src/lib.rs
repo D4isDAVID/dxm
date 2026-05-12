@@ -17,6 +17,8 @@ const ROOT_GITIGNORE: &str = "\
 *
 ";
 
+pub use download::format_git_url;
+
 pub fn resolve<'a, S>(
     client: &'a Client,
     download_url: S,
@@ -29,9 +31,13 @@ where
     resolve::download_url(client, download_url)
 }
 
-/// Downloads and installs the given archive URL to the given directory path.
-/// Returns the archive download URL.
-pub fn install<P, N>(source: &DownloadSource, path: P, nested_path: N) -> Result<(), Box<dyn Error>>
+/// Downloads and installs from given source to the given directory path.
+/// Returns an updated download URL if the source URL is missing details.
+pub fn install<P, N>(
+    source: &DownloadSource,
+    path: P,
+    nested_path: N,
+) -> Result<Option<String>, Box<dyn Error>>
 where
     P: AsRef<Path>,
     N: AsRef<Path>,
@@ -39,9 +45,10 @@ where
     let path = path.as_ref();
     let nested_path = nested_path.as_ref();
 
+    let vacated_dir = VacatedDir::temp(path)?;
+
     fs_err::create_dir_all(path)?;
 
-    let vacated_dir = VacatedDir::temp(path)?;
     let result = source.download(path, nested_path);
 
     if result.is_err()
@@ -50,22 +57,10 @@ where
         vacated_dir.bring_back()?;
     }
 
-    result?;
+    let new_url = result?;
     fs_err::write(path.join(".gitignore"), ROOT_GITIGNORE)?;
 
-    Ok(())
-}
-
-fn move_dir_contents<A, B>(from: A, to: B) -> fs_extra::error::Result<u64>
-where
-    A: AsRef<Path>,
-    B: AsRef<Path>,
-{
-    fs_extra::dir::move_dir(
-        from,
-        to,
-        &fs_extra::dir::CopyOptions::new().content_only(true),
-    )
+    Ok(new_url)
 }
 
 /// Used to move a directory to a temporary location to be later brought back or
@@ -148,6 +143,23 @@ impl VacatedDir {
 
         Ok(())
     }
+}
+
+fn move_dir_contents<A, B>(from: A, to: B) -> fs_extra::error::Result<u64>
+where
+    A: AsRef<Path>,
+    B: AsRef<Path>,
+{
+    fs_extra::dir::move_dir(
+        from,
+        to,
+        &fs_extra::dir::CopyOptions::new().content_only(true),
+    )
+    .inspect_err(|err| {
+        if let fs_extra::error::ErrorKind::Io(err) = &err.kind {
+            log::debug!("io error moving directory contents: {err}")
+        }
+    })
 }
 
 fn is_dir_with_files<P>(path: P) -> std::io::Result<bool>

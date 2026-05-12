@@ -1,6 +1,5 @@
 use std::{error::Error, io::Write, path::Path};
 
-use fs_extra::dir::{CopyOptions, move_dir};
 use reqwest::blocking::Client;
 use tempfile::{NamedTempFile, TempDir};
 use zip::{ZipArchive, read::root_dir_common_filter};
@@ -29,8 +28,7 @@ where
     ZipArchive::new(file.reopen()?)?.extract_unwrapped_root_dir(&dir, root_dir_common_filter)?;
 
     log::debug!("moving contents into {}", path.display());
-    let copy_options = CopyOptions::new().content_only(true);
-    move_dir(dir.path().join(nested_path), path, &copy_options)?;
+    crate::move_dir_contents(dir.path().join(nested_path), path)?;
 
     Ok(())
 }

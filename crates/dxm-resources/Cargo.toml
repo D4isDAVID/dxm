@@ -10,8 +10,10 @@ license.workspace = true
 include.workspace = true
 
 [dependencies]
+dirs.workspace = true
 fs-err.workspace = true
 fs_extra.workspace = true
+git2.workspace = true
 log.workspace = true
 reqwest = { workspace = true, features = ["json"] }
 serde.workspace = true

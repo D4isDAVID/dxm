@@ -93,10 +93,10 @@ where
 
         log::info!("installing resource {}", resource_name);
 
-        dxm_resources::install(&source, &resource_path, nested_path)?;
-        sourcefile::write(base_path.join(resource_name), url)?;
+        let url = dxm_resources::install(&source, &resource_path, nested_path)?.unwrap_or(url);
+        sourcefile::write(base_path.join(resource_name), &url)?;
 
-        Ok(Some(url.into()))
+        Ok(Some(url))
     } else {
         log::warn!("no download url found for {}", resource_name);
 
@@ -139,10 +139,10 @@ where
 
         log::info!("updating resource {}", resource_name);
 
-        dxm_resources::install(&source, &resource_path, nested_path)?;
-        sourcefile::write(base_path.join(resource_name), url)?;
+        let url = dxm_resources::install(&source, &resource_path, nested_path)?.unwrap_or(url);
+        sourcefile::write(base_path.join(resource_name), &url)?;
 
-        Ok(Some(url.into()))
+        Ok(Some(url))
     } else {
         log::warn!("no download url found for {}", resource_name);
         Ok(None)
