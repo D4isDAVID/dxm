@@ -10,8 +10,9 @@ use serde::{Deserialize, Serialize};
 
 pub const LOCKFILE_NAME: &str = "dxm-lock.toml";
 const LOCKFILE_COMMENT: &str = "\
-# THIS IS AN *AUTO-GENERATED* FILE.
+# THIS FILE IS *AUTO-GENERATED* BY dxm.
 # DO *NOT* MODIFY THIS FILE.
+# YOUR VCS *SHOULD* TRACK THIS FILE.
 
 ";
 
@@ -109,8 +110,21 @@ impl Lockfile {
 
         log::debug!("writing lockfile path {}", path.display());
 
-        let contents = toml_edit::ser::to_string(self)?;
-        fs_err::write(path, format!("{}{}", LOCKFILE_COMMENT, contents))?;
+        let mut resources = toml_edit::table();
+        for (name, url) in self.resource_urls.iter() {
+            resources[name] = toml_edit::value(url);
+        }
+
+        let mut document = toml_edit::DocumentMut::new();
+        if let Some(artifact_version) = &self.artifact_version {
+            document["artifact_version"] = toml_edit::value(artifact_version);
+        }
+        if let Some(monitor_url) = &self.monitor_url {
+            document["monitor_url"] = toml_edit::value(monitor_url);
+        }
+        document["resource_urls"] = resources;
+
+        fs_err::write(path, format!("{}{}", LOCKFILE_COMMENT, document))?;
 
         Ok(())
     }
