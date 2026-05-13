@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed `dxm update` without arguments to update everything by default.
 - Updated `dxm install` to install the third-party monitor if exists.
 - Updated `dxm update` to update the third-party monitor if exists.
+- **Breaking:** renamed `dxm run` to `dxm start`.
 
 ### Removed
 

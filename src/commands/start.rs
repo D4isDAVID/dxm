@@ -7,7 +7,7 @@ use dxm_artifacts::cfx::ArtifactsPlatform;
 
 /// The command structure.
 pub fn cli() -> Command {
-    Command::new("run")
+    Command::new("start")
         .about("Start FXServer")
         .arg(
             Arg::new("manifest-path")
@@ -43,7 +43,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let server = &mut manifest.server;
     let data = server.ensure_data(manifest_path)?;
 
-    log::debug!("running server with {}", exe.display());
+    log::debug!("starting server with {}", exe.display());
     log::debug!("using data path {}", data.display());
 
     let mut command = std::process::Command::new(exe);

@@ -12,8 +12,8 @@ pub mod install;
 pub mod monitor;
 pub mod new;
 pub mod remove;
-pub mod run;
 pub mod self_cmd;
+pub mod start;
 pub mod update;
 
 /// Options passed to the top-level `execute` function.
@@ -71,7 +71,7 @@ pub fn cli() -> Command {
         .subcommand(monitor::cli())
         .subcommand(new::cli())
         .subcommand(remove::cli())
-        .subcommand(run::cli())
+        .subcommand(start::cli())
         .subcommand(self_cmd::cli())
         .subcommand(update::cli())
         .arg_required_else_help(true)
@@ -90,7 +90,7 @@ pub fn execute(args: &ArgMatches, options: &ExecuteOptions) -> Result<(), Box<dy
         Some(("monitor", m)) => monitor::execute(m)?,
         Some(("new", m)) => new::execute(m)?,
         Some(("remove", m)) => remove::execute(m)?,
-        Some(("run", m)) => run::execute(m)?,
+        Some(("start", m)) => start::execute(m)?,
         Some(("self", m)) => self_cmd::execute(m)?,
         Some(("update", m)) => update::execute(m)?,
         _ => unreachable!(),
