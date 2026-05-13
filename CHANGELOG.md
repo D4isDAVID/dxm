@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `dxm monitor remove` to remove the third-party monitor if exists.
 - `dxm update --monitor` to update the third-party monitor if exists.
 - `dxm add --git` to install third-party resources through any Git repository.
+- Profiles to use with `dxm start [profile]` to predefine startup arguments and
+  environment variables.
 
 ### Changed
 

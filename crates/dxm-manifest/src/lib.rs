@@ -13,6 +13,7 @@ use crate::util::{add_and_fill_inline_table, add_and_fill_missing_table};
 
 pub mod artifact;
 pub mod lockfile;
+pub mod profile;
 pub mod resource;
 pub mod server;
 pub mod sourcefile;
@@ -31,6 +32,10 @@ pub struct Manifest {
     #[serde(default)]
     pub server: server::Server,
 
+    /// The FXServer startup profiles.
+    #[serde(default)]
+    pub profiles: HashMap<String, profile::Profile>,
+
     /// The data about the third-party resources.
     #[serde(default)]
     pub resources: HashMap<String, resource::Resource>,
@@ -41,11 +46,13 @@ impl Manifest {
     pub fn new(
         artifact: artifact::Artifact,
         server: server::Server,
+        profiles: HashMap<String, profile::Profile>,
         resources: HashMap<String, resource::Resource>,
     ) -> Self {
         Self {
             artifact,
             server,
+            profiles,
             resources,
         }
     }
