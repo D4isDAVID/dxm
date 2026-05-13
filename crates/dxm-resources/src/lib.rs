@@ -11,6 +11,7 @@ use tempfile::TempDir;
 use crate::download::DownloadSource;
 
 mod download;
+pub mod patch;
 mod resolve;
 
 const ROOT_GITIGNORE: &str = "\

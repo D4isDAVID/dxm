@@ -61,9 +61,9 @@ dxm-home.workspace = true
 dxm-init.workspace = true
 dxm-manifest.workspace = true
 dxm-resources.workspace = true
+fern.workspace = true
 log.workspace = true
 reqwest.workspace = true
-fern.workspace = true
 
 [profile.release]
 codegen-units = 1

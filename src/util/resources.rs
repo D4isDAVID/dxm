@@ -12,11 +12,14 @@ pub fn install<P>(
 where
     P: AsRef<Path>,
 {
+    let manifest_path = manifest_path.as_ref();
+
     let resources_path = manifest.server.resources(manifest_path);
 
     for (resource_name, resource) in manifest.resources.iter() {
         let lock_url = install_single(
             client,
+            manifest_path,
             &resources_path,
             resource,
             lockfile.get_resource_url(resource_name),
@@ -40,11 +43,14 @@ pub fn update<P>(
 where
     P: AsRef<Path>,
 {
+    let manifest_path = manifest_path.as_ref();
+
     let resources_path = manifest.server.resources(manifest_path);
 
     for (resource_name, resource) in manifest.resources.iter() {
         let lock_url = update_single(
             client,
+            manifest_path,
             &resources_path,
             resource,
             lockfile.get_resource_url(resource_name),
@@ -59,17 +65,20 @@ where
     Ok(())
 }
 
-pub fn install_single<P, S>(
+pub fn install_single<M, P, S>(
     client: &Client,
+    manifest_path: M,
     resources_path: P,
     resource: &Resource,
     lock_url: Option<&str>,
     resource_name: S,
 ) -> Result<Option<String>, Box<dyn Error>>
 where
+    M: AsRef<Path>,
     P: AsRef<Path>,
     S: AsRef<str>,
 {
+    let manifest_path = manifest_path.as_ref();
     let resources_path = resources_path.as_ref();
     let resource_name = resource_name.as_ref();
 
@@ -88,13 +97,17 @@ where
         if source_url.is_some_and(|u| u == url) {
             log::info!("resource {} already installed", resource_name);
 
+            patch(manifest_path, resource_path, resource, resource_name)?;
+
             return Ok(None);
         }
 
         log::info!("installing resource {}", resource_name);
 
         let url = dxm_resources::install(&source, &resource_path, nested_path)?.unwrap_or(url);
-        sourcefile::write(resource_path, &url)?;
+        sourcefile::write(&resource_path, &url)?;
+
+        patch(manifest_path, resource_path, resource, resource_name)?;
 
         Ok(Some(url))
     } else {
@@ -104,17 +117,20 @@ where
     }
 }
 
-pub fn update_single<P, S>(
+pub fn update_single<M, P, S>(
     client: &Client,
+    manifest_path: M,
     resources_path: P,
     resource: &Resource,
     lock_url: Option<&str>,
     resource_name: S,
 ) -> Result<Option<String>, Box<dyn Error>>
 where
+    M: AsRef<Path>,
     P: AsRef<Path>,
     S: AsRef<str>,
 {
+    let manifest_path = manifest_path.as_ref();
     let resources_path = resources_path.as_ref();
     let resource_name = resource_name.as_ref();
 
@@ -133,13 +149,17 @@ where
         if lockfile_updated && sourcefile_updated {
             log::info!("resource {} already updated", resource_name);
 
+            patch(manifest_path, resource_path, resource, resource_name)?;
+
             return Ok(None);
         }
 
         log::info!("updating resource {}", resource_name);
 
         let url = dxm_resources::install(&source, &resource_path, nested_path)?.unwrap_or(url);
-        sourcefile::write(resource_path, &url)?;
+        sourcefile::write(&resource_path, &url)?;
+
+        patch(manifest_path, resource_path, resource, resource_name)?;
 
         Ok(Some(url))
     } else {
@@ -166,6 +186,30 @@ where
     log::info!("uninstalling resource {}", resource_name);
 
     fs::remove_dir_all(resource_path)?;
+
+    Ok(())
+}
+
+fn patch<M, R, S>(
+    manifest_path: M,
+    resource_path: R,
+    resource: &Resource,
+    resource_name: S,
+) -> Result<(), Box<dyn Error>>
+where
+    M: AsRef<Path>,
+    R: AsRef<Path>,
+    S: AsRef<str>,
+{
+    if let Some(patch) = resource.patch(manifest_path)
+        && dxm_resources::patch::is_pending(&patch, &resource_path)?
+    {
+        log::info!("patching resource {}", resource_name.as_ref());
+
+        dxm_resources::patch::apply(patch, resource_path, false)?;
+
+        log::info!("patched resource {}", resource_name.as_ref());
+    }
 
     Ok(())
 }

@@ -25,6 +25,8 @@ pub struct Resource {
     ///
     /// Default: `.`
     nested_path: Option<PathBuf>,
+    /// The path to a resource patch.
+    patch: Option<PathBuf>,
 }
 
 impl Resource {
@@ -39,6 +41,7 @@ impl Resource {
             url: Some(url.into()),
             category: Some(category.into()),
             nested_path: Some(nested_path.into()),
+            patch: None,
         }
     }
 
@@ -98,6 +101,32 @@ impl Resource {
         self.nested_path.as_ref().unwrap_or(&*DEFAULT_NESTED_PATH)
     }
 
+    /// Sets the resource's patch path relative to the given manifest file path.
+    pub fn set_patch<M, P>(&mut self, manifest_path: M, patch: P) -> Result<(), StripPrefixError>
+    where
+        M: AsRef<Path>,
+        P: AsRef<Path>,
+    {
+        self.patch = Some(relative_path(manifest_path, patch)?);
+
+        Ok(())
+    }
+
+    /// Removes the resource's patch path.
+    pub fn remove_patch(&mut self) {
+        self.patch = None;
+    }
+
+    /// Returns the resource's patch path appended to the given manifest file path, if it exists.
+    pub fn patch<P>(&self, manifest_path: P) -> Option<PathBuf>
+    where
+        P: AsRef<Path>,
+    {
+        self.patch
+            .as_ref()
+            .and_then(|p| Some(manifest_path.as_ref().join(p)))
+    }
+
     /// Fills out information about the resource inside the given TOML document.
     pub fn fill_toml_item(&self, item: &mut toml_edit::Item) {
         let category = self.relative_category();
@@ -118,6 +147,9 @@ impl Resource {
         }
         if let Some(url) = self.url() {
             item["url"] = toml_edit::value(url);
+        }
+        if let Some(patch) = self.patch.as_ref() {
+            item["patch"] = toml_edit::value(patch.to_string_lossy().into_owned());
         }
     }
 }

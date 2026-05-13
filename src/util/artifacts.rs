@@ -128,6 +128,7 @@ where
 
     let result = crate::util::resources::install_single(
         client,
+        manifest_path,
         resources_path,
         resource,
         lockfile.monitor_url(),
@@ -168,6 +169,7 @@ where
 
     let lock_url = crate::util::resources::update_single(
         client,
+        manifest_path,
         resources_path,
         resource,
         lockfile.monitor_url(),

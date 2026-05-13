@@ -98,6 +98,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let client = crate::util::reqwest::client().build()?;
     let lock_url = crate::util::resources::install_single(
         &client,
+        &manifest_path,
         manifest.server.resources(&manifest_path),
         &resources[name],
         lockfile.get_resource_url(name),

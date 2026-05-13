@@ -11,6 +11,7 @@ pub mod init;
 pub mod install;
 pub mod monitor;
 pub mod new;
+pub mod patch;
 pub mod remove;
 pub mod self_cmd;
 pub mod start;
@@ -70,6 +71,7 @@ pub fn cli() -> Command {
         .subcommand(install::cli())
         .subcommand(monitor::cli())
         .subcommand(new::cli())
+        .subcommand(patch::cli())
         .subcommand(remove::cli())
         .subcommand(start::cli())
         .subcommand(self_cmd::cli())
@@ -89,6 +91,7 @@ pub fn execute(args: &ArgMatches, options: &ExecuteOptions) -> Result<(), Box<dy
         Some(("install", m)) => install::execute(m)?,
         Some(("monitor", m)) => monitor::execute(m)?,
         Some(("new", m)) => new::execute(m)?,
+        Some(("patch", m)) => patch::execute(m)?,
         Some(("remove", m)) => remove::execute(m)?,
         Some(("start", m)) => start::execute(m)?,
         Some(("self", m)) => self_cmd::execute(m)?,
