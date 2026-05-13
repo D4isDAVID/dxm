@@ -84,7 +84,7 @@ where
         let url = source.url();
         log::debug!("resolved resource url to {}", source);
 
-        let source_url = sourcefile::read(base_path.join(resource_name))?;
+        let source_url = sourcefile::read(&resource_path)?;
         if source_url.is_some_and(|u| u == url) {
             log::info!("resource {} already installed", resource_name);
 
@@ -94,7 +94,7 @@ where
         log::info!("installing resource {}", resource_name);
 
         let url = dxm_resources::install(&source, &resource_path, nested_path)?.unwrap_or(url);
-        sourcefile::write(base_path.join(resource_name), &url)?;
+        sourcefile::write(resource_path, &url)?;
 
         Ok(Some(url))
     } else {
@@ -128,8 +128,7 @@ where
         log::debug!("resolved resource url to {}", url);
 
         let lockfile_updated = lock_url.is_some_and(|u| u == url);
-        let sourcefile_updated =
-            sourcefile::read(base_path.join(resource_name))?.is_some_and(|u| u == url);
+        let sourcefile_updated = sourcefile::read(&resource_path)?.is_some_and(|u| u == url);
 
         if lockfile_updated && sourcefile_updated {
             log::info!("resource {} already updated", resource_name);
@@ -140,7 +139,7 @@ where
         log::info!("updating resource {}", resource_name);
 
         let url = dxm_resources::install(&source, &resource_path, nested_path)?.unwrap_or(url);
-        sourcefile::write(base_path.join(resource_name), &url)?;
+        sourcefile::write(resource_path, &url)?;
 
         Ok(Some(url))
     } else {
