@@ -54,13 +54,6 @@ where
     let artifact = &manifest.artifact;
     let artifact_path = artifact.path(&manifest_path);
 
-    let vacated_monitor = dxm_resources::VacatedDir::temp(
-        manifest
-            .artifact
-            .system_resources(manifest_path, platform)
-            .join(MONITOR_RESOURCE),
-    )?;
-
     let version = if let Some(channel) = artifact.channel() {
         log::info!("getting versions");
 
@@ -83,6 +76,20 @@ where
 
         return Ok(());
     }
+
+    let vacated_monitor = manifest
+        .artifact
+        .monitor()
+        .map(|_| {
+            dxm_resources::VacatedDir::temp(
+                manifest
+                    .artifact
+                    .system_resources(manifest_path, platform)
+                    .join(MONITOR_RESOURCE),
+            )
+        })
+        .transpose()?
+        .flatten();
 
     log::info!("updating to artifact {}", &version);
 
