@@ -36,7 +36,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
 
     if let Some(resource) = manifest.resources.get(name) {
         crate::util::resources::uninstall_single(
-            &manifest.server.resources(&manifest_path),
+            manifest.server.resources(&manifest_path),
             resource,
             name,
         )?;
