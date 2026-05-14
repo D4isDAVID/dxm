@@ -18,14 +18,22 @@ pub fn cli() -> Command {
                 .default_value("."),
         )
         .arg(
-            Arg::new("resource")
-                .help("Update only the specified third-party resource")
-                .long("resource")
-                .short('r'),
+            Arg::new("artifacts")
+                .help("Update the FXServer artifacts")
+                .long("artifacts")
+                .short('a')
+                .action(ArgAction::SetTrue),
+        )
+        .arg(
+            Arg::new("resources")
+                .help("Update the specified third-party resources")
+                .long("resources")
+                .short('r')
+                .num_args(0..),
         )
         .arg(
             Arg::new("monitor")
-                .help("Update only the third-party FXServer monitor")
+                .help("Update the third-party FXServer monitor")
                 .long("monitor")
                 .short('m')
                 .action(ArgAction::SetTrue),
@@ -37,6 +45,13 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let manifest_path = args
         .get_one::<PathBuf>("manifest-path")
         .expect("no manifest path");
+    let artifacts = args.get_flag("artifacts");
+    let resources = args
+        .get_many::<String>("resources")
+        .map(Iterator::collect::<Vec<_>>);
+    let monitor = args.get_flag("monitor");
+
+    let update_all = !artifacts && resources.is_none() && !monitor;
 
     let (manifest_path, manifest) = crate::util::manifest::find(manifest_path)?;
     let mut lockfile = Lockfile::read(&manifest_path)?;
@@ -44,41 +59,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let client = crate::util::reqwest::github_client().build()?;
     let platform = ArtifactsPlatform::default();
 
-    if let Some(resource_name) = args.get_one::<String>("resource") {
-        if let Some(resource) = manifest.resources.get(resource_name) {
-            let lock_url = crate::util::resources::update_single(
-                &client,
-                &manifest_path,
-                manifest.server.resources(&manifest_path),
-                resource,
-                lockfile.get_resource_url(resource_name),
-                resource_name,
-            )?;
-
-            if let Some(lock_url) = lock_url {
-                lockfile.set_resource_url(resource_name, lock_url);
-            }
-
-            lockfile.write(manifest_path)?;
-
-            log::info!("successfully updated resource");
-        } else {
-            log::error!("no such resource {}", resource_name);
-        }
-    } else if args.get_flag("monitor") {
-        if let Some(monitor) = manifest.artifact.monitor() {
-            crate::util::artifacts::update_monitor(
-                &client,
-                manifest_path,
-                &manifest.artifact,
-                &platform,
-                monitor,
-                &mut lockfile,
-            )?;
-        } else {
-            log::error!("no third-party monitor installed");
-        }
-    } else {
+    if artifacts || update_all {
         crate::util::artifacts::update(
             &client,
             &platform,
@@ -86,7 +67,22 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
             &manifest,
             &mut lockfile,
         )?;
+    }
 
+    if let Some(resources) = resources.or_else(|| if update_all { Some(Vec::new()) } else { None })
+    {
+        crate::util::resources::update(
+            &client,
+            &manifest_path,
+            &manifest,
+            &mut lockfile,
+            resources,
+        )?;
+
+        log::info!("successfully updated resources");
+    }
+
+    if monitor || update_all {
         if let Some(monitor) = manifest.artifact.monitor() {
             crate::util::artifacts::update_monitor(
                 &client,
@@ -96,13 +92,9 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
                 monitor,
                 &mut lockfile,
             )?;
+        } else if monitor {
+            log::info!("no third-party monitor installed");
         }
-
-        crate::util::resources::update(&client, &manifest_path, &manifest, &mut lockfile)?;
-
-        lockfile.write(manifest_path)?;
-
-        log::info!("successfully updated resources");
     }
 
     Ok(())

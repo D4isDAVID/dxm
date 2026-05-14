@@ -39,6 +39,7 @@ pub fn update<P>(
     manifest_path: P,
     manifest: &Manifest,
     lockfile: &mut Lockfile,
+    resource_names: Vec<&String>,
 ) -> Result<(), Box<dyn Error>>
 where
     P: AsRef<Path>,
@@ -47,7 +48,19 @@ where
 
     let resources_path = manifest.server.resources(manifest_path);
 
-    for (resource_name, resource) in manifest.resources.iter() {
+    let iter = if resource_names.is_empty() {
+        manifest.resources.keys().collect()
+    } else {
+        resource_names
+    };
+
+    for resource_name in iter {
+        let Some(resource) = manifest.resources.get(resource_name) else {
+            log::warn!("no such resource {resource_name}");
+
+            continue;
+        };
+
         let lock_url = update_single(
             client,
             manifest_path,
