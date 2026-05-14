@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `dxm add --git` to install third-party resources through any Git repository.
 - Profiles to use with `dxm start [profile]` to predefine startup arguments and
   environment variables.
+- `dxm patch prepare` to prepare a third-party resource for persistent patching.
+- `dxm patch commit` to create a persistent patch for a third-party resource.
+- `dxm patch remove` to remove a persistent patch for a third-party resource.
 
 ### Changed
 

@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `VacatedDir` to move a directory to a different location to be later brought
   back or deleted.
 - `format_git_url` to create a download URL for Git resources.
+- Persistent resource patching.
 
 ### Changed
 

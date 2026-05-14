@@ -48,6 +48,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         if let Some(resource) = manifest.resources.get(resource_name) {
             let lock_url = crate::util::resources::update_single(
                 &client,
+                &manifest_path,
                 manifest.server.resources(&manifest_path),
                 resource,
                 lockfile.get_resource_url(resource_name),
