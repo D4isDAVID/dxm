@@ -18,9 +18,11 @@ jobs:
             target: x86_64-pc-windows-msvc
           - type: linux-x64
             os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
+            target: x86_64-unknown-linux-musl
+
     name: Upload Artifact (${{ matrix.type }})
     runs-on: ${{ matrix.os }}
+    container: ${{ contains(matrix.target, 'musl') && 'ghcr.io/blackdex/rust-musl:x86_64-musl' || null }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -33,13 +35,13 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          cargo build --verbose --locked --release
+          cargo build --verbose --locked --release --target ${{ matrix.target }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v6
         with:
           name: dxm-${{ matrix.type }}
-          path: ./target/release/dxm${{ runner.os == 'Windows' && '.exe' || '' }}
+          path: ./target/${{ matrix.target }}/release/dxm${{ runner.os == 'Windows' && '.exe' || '' }}
 
   release:
     name: Draft Release

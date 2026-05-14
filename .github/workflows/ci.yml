@@ -46,10 +46,11 @@ jobs:
             target: x86_64-pc-windows-msvc
           - type: linux-x64
             os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
+            target: x86_64-unknown-linux-musl
 
     name: Test (${{ matrix.type }})
     runs-on: ${{ matrix.os }}
+    container: ${{ contains(matrix.target, 'musl') && 'ghcr.io/blackdex/rust-musl:x86_64-musl' || null }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -60,4 +61,4 @@ jobs:
           targets: ${{ matrix.target }}
 
       - name: Test
-        run: cargo test --verbose --locked --workspace
+        run: cargo test --verbose --locked --workspace --target ${{ matrix.target }}

@@ -25,10 +25,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated `dxm install` to install the third-party monitor if exists.
 - Updated `dxm update` to update the third-party monitor if exists.
 - **Breaking:** renamed `dxm run` to `dxm start`.
+- Changed Linux release target to `x86_64-unknown-linux-musl` to support more
+  Linux versions.
 
 ### Removed
 
 - **Breaking:** `dxm update --all` - use `dxm update` instead.
+- Colors from help and usage messages for uniform coloring.
 
 ## [0.2.4] - 2026-03-07
 

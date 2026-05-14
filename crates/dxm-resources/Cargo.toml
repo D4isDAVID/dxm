@@ -13,7 +13,7 @@ include.workspace = true
 dirs.workspace = true
 fs-err.workspace = true
 fs_extra.workspace = true
-git2.workspace = true
+git2 = { workspace = true, features = ["ssh", "https"] }
 log.workspace = true
 reqwest = { workspace = true, features = ["json"] }
 serde.workspace = true
