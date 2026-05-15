@@ -30,11 +30,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking:** renamed `dxm run` to `dxm start`.
 - Changed Linux release target to `x86_64-unknown-linux-musl` to support more
   Linux versions.
+- **Breaking:** Updated `dxm update -a` to correlate to `dxm update --artifacts`
+  since `dxm update --all` has been removed.
 
 ### Removed
 
 - **Breaking:** `dxm update --all` - use `dxm update` instead.
 - Colors from help and usage messages for uniform coloring.
+- **Breaking:** `dxm artifacts update` - use `dxm update --artifacts` instead.
 
 ## [0.2.4] - 2026-03-07
 
