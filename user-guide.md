@@ -189,6 +189,10 @@ dxm remove loadscreen
 
 ## Patching Resources
 
+> [!NOTE]
+> Resource patching requires `git` binary to be installed and available in the
+> environment PATH.
+
 Some third-party resources require editing their files for configuration, and
 sometimes simply tweaking some functionality is useful. dxm provides an easy way
 to do so with persistent patches.
