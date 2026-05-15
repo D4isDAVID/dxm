@@ -20,8 +20,12 @@ Supports JG Scripts [Artifacts DB].
 
 ### Resource Management
 
-Install and update third-party resources via dxm.
-Currently supports GitHub repositories and direct download URLs.
+Install, update and patch third-party resources via dxm.
+Currently supports Git and GitHub repositories, and direct download URLs.
+
+### Third-Party Monitor Management
+
+Install and update third-party txAdmin replacements via dxm.
 
 ### Planned
 
