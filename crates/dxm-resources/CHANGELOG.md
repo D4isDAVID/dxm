@@ -27,6 +27,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - **Breaking:** `Lockfile::new`.
+- **Breaking:** resolving most branch and tag names from most GitHub blob URLs -
+  pass a non-blob URL instead.
+
+### Fixed
+
+- Resolving branch and tag names containing forward-slashes (`/`) for GitHub
+  URLs.
 
 ## 0.2.3 - 2026-03-07
 

@@ -38,6 +38,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking:** `dxm update --all` - use `dxm update` instead.
 - Colors from help and usage messages for uniform coloring.
 - **Breaking:** `dxm artifacts update` - use `dxm update --artifacts` instead.
+- **Breaking:** resolving most GitHub branch and tag names from most blob URLs -
+  pass a non-blob URL instead.
+
+### Fixed
+
+- Resolving GitHub branch and tag names containing forward-slashes (`/`).
 
 ## [0.2.4] - 2026-03-07
 
