@@ -97,5 +97,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         }
     }
 
+    lockfile.write(manifest_path)?;
+
     Ok(())
 }
