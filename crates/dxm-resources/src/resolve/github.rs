@@ -93,7 +93,11 @@ where
 
     let link_data = parts.get(3).cloned().unwrap_or("");
 
-    let head = if is_release && (link_data == "tag" || link_data == "download") {
+    if is_release && link_data == "download" {
+        return Ok(Some(url.into()));
+    }
+
+    let head = if is_release && link_data == "tag" {
         parts.get(4..).map(|v| v.join("/")).unwrap_or("".to_owned())
     } else {
         parts.get(3..).map(|v| v.join("/")).unwrap_or("".to_owned())

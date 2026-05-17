@@ -23,6 +23,16 @@ pub struct GithubRepository {
     default_branch: String,
 }
 
+#[derive(Deserialize)]
+pub struct GithubRef {
+    object: GithubRefObject,
+}
+
+#[derive(Deserialize)]
+pub struct GithubRefObject {
+    sha: String,
+}
+
 pub fn get_latest_release_archive_url<S>(client: &Client, repo: S) -> Result<String, Box<dyn Error>>
 where
     S: AsRef<str>,
@@ -64,7 +74,14 @@ where
         .error_for_status()?
         .json::<GithubRepository>()?;
 
-    Ok(branch_archive_url(repo.full_name, repo.default_branch))
+    let branch_url = branch_api_url(&repo.full_name, repo.default_branch);
+    let head = client
+        .get(&branch_url)
+        .send()?
+        .error_for_status()?
+        .json::<GithubRef>()?;
+
+    Ok(commit_archive_url(repo.full_name, head.object.sha))
 }
 
 pub fn get_branch_or_commit_archive_url<R, S>(
@@ -80,11 +97,13 @@ where
     let commit = commit.as_ref();
 
     let branch_url = branch_api_url(repo, commit);
-    let response = client.head(branch_url).send()?;
+    let head = client.get(branch_url).send()?;
 
-    if response.status().is_success() {
-        return Ok(branch_archive_url(repo, commit));
-    }
+    let commit = if head.status().is_success() {
+        &head.json::<GithubRef>()?.object.sha
+    } else {
+        commit
+    };
 
     Ok(commit_archive_url(repo, commit))
 }
@@ -111,17 +130,6 @@ where
         .unwrap_or_else(|| tag_archive_url(repo, release.tag_name));
 
     Ok(archive_url)
-}
-
-fn branch_archive_url<R, S>(repo: R, branch: S) -> String
-where
-    R: AsRef<str>,
-    S: AsRef<str>,
-{
-    let repo = repo.as_ref();
-    let branch = branch.as_ref();
-
-    commit_archive_url(repo, format!("refs/heads/{}", branch))
 }
 
 fn tag_archive_url<R, S>(repo: R, tag: S) -> String
@@ -220,14 +228,6 @@ mod tests {
         assert_eq!(
             tag_archive_url("example/test", "v1.0.0"),
             "https://github.com/example/test/archive/refs/tags/v1.0.0.zip"
-        );
-    }
-
-    #[test]
-    fn returns_branch_archive_url() {
-        assert_eq!(
-            branch_archive_url("example/test", "main"),
-            "https://github.com/example/test/archive/refs/heads/main.zip"
         );
     }
 }
