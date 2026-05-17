@@ -1,0 +1,13 @@
+# Cache
+/cache/
+
+# KVP
+/db/
+
+# Miscellaneous
+/.replxx_history
+/imgui.ini
+
+# Environment
+/env.cfg
+/secrets.cfg

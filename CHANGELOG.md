@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Linux versions.
 - **Breaking:** Updated `dxm update -a` to correlate to `dxm update --artifacts`
   since `dxm update --all` has been removed.
+- Updated the `dxm init` template.
 
 ### Removed
 

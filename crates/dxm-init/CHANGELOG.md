@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+### Added
+
+- More CFG files and default convars.
+- Default README.
+- Default txAdmin config.
+
 ## 0.2.2 - 2026-03-07
 
 [dxm 0.2.4]

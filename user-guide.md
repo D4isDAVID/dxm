@@ -288,6 +288,9 @@ To start FXServer via dxm, use:
 dxm start
 ```
 
+This will start FXServer inside of the server's data directory, defined in the
+manifest file.
+
 You can also specify environment variables and server arguments:
 
 ```sh

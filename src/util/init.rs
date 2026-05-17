@@ -22,6 +22,9 @@ where
 
     crate::util::artifacts::update(&client, &platform, &manifest_path, &manifest, &mut lockfile)?;
 
+    crate::util::artifacts::install(&client, &platform, &manifest_path, &manifest, &mut lockfile)?;
+    crate::util::resources::install(&client, &manifest_path, &manifest, &mut lockfile)?;
+
     lockfile.write(manifest_path)?;
 
     Ok(())
