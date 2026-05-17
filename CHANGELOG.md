@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [unreleased diff]
 
+## [0.3.0] - 2026-05-18
+
+[0.3.0 diff]
+
 ### Added
 
 - `dxm monitor install` to install a third-party monitor.
@@ -133,7 +137,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release.
 
-[unreleased diff]: https://github.com/D4isDAVID/dxm/compare/v0.2.4...main
+[unreleased diff]: https://github.com/D4isDAVID/dxm/compare/v0.3.0...main
+[0.3.0]: https://github.com/D4isDAVID/dxm/releases/tag/v0.3.0
+[0.3.0 diff]: https://github.com/D4isDAVID/dxm/compare/v0.2.4...v0.3.0
 [0.2.4]: https://github.com/D4isDAVID/dxm/releases/tag/v0.2.4
 [0.2.4 diff]: https://github.com/D4isDAVID/dxm/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/D4isDAVID/dxm/releases/tag/v0.2.3
