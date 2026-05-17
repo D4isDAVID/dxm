@@ -25,7 +25,7 @@ pub fn execute(_args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let current = concat!("v", clap::crate_version!());
 
     if tag_name == current {
-        log::info!("you already on the latest version");
+        log::info!("you are already on the latest version");
         return Ok(());
     }
 

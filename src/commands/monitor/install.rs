@@ -56,7 +56,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
 
     let resource = Resource::new(url, PathBuf::from(""), &nested_path);
 
-    let client = crate::util::reqwest::client().build()?;
+    let client = crate::util::reqwest::github_client().build()?;
     let platform = ArtifactsPlatform::default();
 
     crate::util::artifacts::install_monitor(

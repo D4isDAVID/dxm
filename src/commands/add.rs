@@ -95,7 +95,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         resources.insert(name.to_owned(), Resource::new(url, category, &nested_path));
     }
 
-    let client = crate::util::reqwest::client().build()?;
+    let client = crate::util::reqwest::github_client().build()?;
     let lock_url = crate::util::resources::install_single(
         &client,
         &manifest_path,
