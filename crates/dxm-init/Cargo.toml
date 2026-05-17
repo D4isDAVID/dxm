@@ -7,7 +7,13 @@ rust-version.workspace = true
 description = "Crate for initializing FXServer data directories."
 repository.workspace = true
 license.workspace = true
-include.workspace = true
+include = [
+  "src",
+  "templates",
+  "CHANGELOG.md",
+  "LICENSE",
+  "README.md"
+]
 
 [dependencies]
 dxm-manifest.workspace = true
