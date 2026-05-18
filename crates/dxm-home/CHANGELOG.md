@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+### Changed
+
+- Changed the Linux `env.sh` to export `DXM_HOME`.
+
 ## 0.1.5 - 2026-05-18
 
 [dxm 0.3.0]

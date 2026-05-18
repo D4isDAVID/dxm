@@ -93,10 +93,16 @@ impl Home {
 
         #[cfg(unix)]
         {
+            let home_dir = format!("{}", self.path().display());
             let bin_dir = format!("{}", bin_dir.display());
 
             log::trace!("writing env script");
-            fs_err::write(self.env_sh(), ENV_SCRIPT.replace("{dxm_bin}", &bin_dir))?;
+            fs_err::write(
+                self.env_sh(),
+                ENV_SCRIPT
+                    .replace("{dxm_home}", &home_dir)
+                    .replace("{dxm_bin}", &bin_dir),
+            )?;
         }
 
         if !self.is_current_exe_dxm()? {

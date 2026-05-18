@@ -6,6 +6,7 @@ case ":${PATH}:" in
     *:"{dxm_bin}":*)
         ;;
     *)
+        export DXM_HOME="{dxm_home}"
         export PATH="{dxm_bin}:$PATH"
         ;;
 esac

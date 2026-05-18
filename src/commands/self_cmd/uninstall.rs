@@ -35,7 +35,10 @@ pub fn execute(args: &ArgMatches) -> std::io::Result<()> {
     let home = Home::default();
 
     if !home.exists()? {
-        log::info!("there is nothing to uninstall");
+        log::info!(
+            "there is nothing to uninstall (DXM_HOME is {})",
+            home.path().display()
+        );
         return Ok(());
     }
 
