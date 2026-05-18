@@ -6,7 +6,30 @@ expected.
 
 ## Installing dxm
 
-To install dxm, follow these steps:
+Installing dxm will set up a `.dxm` directory in your home directory and add the
+dxm binary to the environment `PATH`. After restarting the terminal, you will be
+able to use `dxm` from any directory.
+
+### Quick Install Script
+
+#### Windows
+
+In PowerShell, run:
+
+```ps1
+iwr https://github.com/D4isDAVID/dxm/raw/main/scripts/install.ps1 | iex
+```
+
+#### Linux
+
+Make sure that `curl` and `tar` are installed and available from the environment
+PATH. Then, run:
+
+```ps1
+curl -fsSL https://github.com/D4isDAVID/dxm/raw/main/scripts/install.sh | bash
+```
+
+### Manual Installation
 
 1. Install the appropriate archive for your operating system from the latest
     [GitHub release].
@@ -20,10 +43,6 @@ To install dxm, follow these steps:
     ```sh
     ./dxm self setup
     ```
-
-This will set up a `.dxm` directory in your home directory and add the dxm
-binary to the environment `PATH`. After restarting the terminal, you will be
-able to use `dxm` from any directory.
 
 ## Updating dxm
 
