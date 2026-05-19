@@ -8,5 +8,5 @@ charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
 
-[*.{rs,sh,ps1}]
+[{*.{rs,sh,ps1},Dockerfile}]
 indent_size = 4
