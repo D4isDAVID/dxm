@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+### Fixed
+
+- Stray `.` in `txhost_data_path` default value.
+
 ## 0.5.0 - 2026-05-18
 
 [dxm 0.3.0]

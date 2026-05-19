@@ -85,7 +85,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         profile_vars.extend(env_vars);
 
         let txdata_path = profile.txhost_data_path(manifest_path)?;
-        log::debug!("using txdata path {}", txdata_path.display());
+        log::debug!("using txData path {}", txdata_path.display());
 
         std::process::Command::new(exe)
             .current_dir(&data)

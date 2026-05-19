@@ -48,7 +48,7 @@ impl Profile {
             self.env_vars
                 .get(TXHOST_DATA_PATH)
                 .map(|s| s.as_str())
-                .unwrap_or("./txData"),
+                .unwrap_or("txData"),
         );
 
         fs_err::create_dir_all(&path)?;
