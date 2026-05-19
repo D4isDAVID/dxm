@@ -131,7 +131,7 @@ jobs:
           push: true
           tags: |
             ${{ vars.DOCKERHUB_USERNAME }}/dxm:dev
-            ghcr.io/${{ github.repository_owner }}/dxm:dev
+            ghcr.io/${{ vars.GHCR_USERNAME }}/dxm:dev
 
       - name: Build and push (Tag)
         uses: docker/build-push-action@v7
