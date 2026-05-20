@@ -19,9 +19,9 @@ include = [
 clap = { version = "4.6.1", default-features = false, features = ["std", "help", "usage", "error-context", "cargo"] }
 dirs = "6.0.0"
 dxm-artifacts = { path = "./crates/dxm-artifacts", version = "0.3.0" }
-dxm-home = { path = "./crates/dxm-home", version = "0.1.5" }
+dxm-home = { path = "./crates/dxm-home", version = "0.1.6" }
 dxm-init = { path = "./crates/dxm-init", version = "0.3.0" }
-dxm-manifest = { path = "./crates/dxm-manifest", version = "0.5.0" }
+dxm-manifest = { path = "./crates/dxm-manifest", version = "0.5.1" }
 dxm-resources = { path = "./crates/dxm-resources", version = "0.3.0" }
 fern = "0.7.1"
 flate2 = "1.1.9"
@@ -43,7 +43,7 @@ zip = { version = "8.6.0", default-features = false, features = ["deflate"] }
 
 [package]
 name = "dxm"
-version = "0.3.0"
+version = "0.3.1"
 authors.workspace = true
 edition.workspace = true
 rust-version.workspace = true

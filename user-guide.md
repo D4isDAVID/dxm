@@ -44,6 +44,24 @@ curl -fsSL https://github.com/D4isDAVID/dxm/raw/main/scripts/install.sh | bash
     ./dxm self setup
     ```
 
+### Docker Image
+
+Docker images for dxm are available in [Docker Hub] and the
+[GitHub Container Registry]. It uses [`alpine`] as its base with `git`
+preinstalled for resource patches, and `dxm` installed in `/opt/dxm` and exposed
+in the environment `PATH`. The default entrypoint is `dxm start`.
+
+Example `Dockerfile`:
+
+```Dockerfile
+FROM d4isdavid/dxm:latest AS base
+
+WORKDIR /usr/src/server
+COPY . .
+
+RUN dxm install
+```
+
 ## Updating dxm
 
 To update dxm, run:
@@ -357,4 +375,7 @@ server_args = ["+exec", "server.cfg"]
 ```
 
 [github release]: https://github.com/D4isDAVID/dxm/releases
+[docker hub]: https://hub.docker.com/r/d4isdavid/dxm
+[github container registry]: https://github.com/D4isDAVID/dxm/pkgs/container/dxm
+[`alpine`]: https://hub.docker.com/_/alpine
 [`cfx-server-data`]: https://github.com/citizenfx/cfx-server-data

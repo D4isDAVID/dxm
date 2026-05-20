@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+## 0.1.6 - 2026-05-20
+
+[dxm 0.3.1]
+
 ### Changed
 
 - Changed the Linux `env.sh` to export `DXM_HOME`.
@@ -62,6 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial release.
 
 [dxm unreleased]: https://github.com/D4isDAVID/dxm/commits/main/crates/dxm-home
+[dxm 0.3.1]: https://github.com/D4isDAVID/dxm/commits/v0.3.1/crates/dxm-home
 [dxm 0.3.0]: https://github.com/D4isDAVID/dxm/commits/v0.3.0/crates/dxm-home
 [dxm 0.2.4]: https://github.com/D4isDAVID/dxm/commits/v0.2.4/crates/dxm-home
 [dxm 0.2.3]: https://github.com/D4isDAVID/dxm/commits/v0.2.3/crates/dxm-home
