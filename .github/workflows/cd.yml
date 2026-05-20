@@ -139,7 +139,7 @@ jobs:
         with:
           push: true
           tags: |
-            ${{ vars.DOCKERHUB_USERNAME }}/dxm:latest
             ${{ vars.DOCKERHUB_USERNAME }}/dxm:${{ github.ref_name }}
-            ghcr.io/${{ vars.GHCR_USERNAME }}/dxm:latest
+            ${{ vars.DOCKERHUB_USERNAME }}/dxm:latest
             ghcr.io/${{ vars.GHCR_USERNAME }}/dxm:${{ github.ref_name }}
+            ghcr.io/${{ vars.GHCR_USERNAME }}/dxm:latest
