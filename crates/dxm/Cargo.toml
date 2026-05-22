@@ -1,0 +1,18 @@
+[package]
+name = "dxm"
+version = "0.3.1"
+description = "CLI tool for managing FXServer artifacts & resources."
+categories = ["command-line-utilities"]
+authors.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+license.workspace = true
+keywords.workspace = true
+exclude.workspace = true
+
+[profile.release]
+opt-level = "z"
+strip = "symbols"
+lto = "fat"
+codegen-units = 1

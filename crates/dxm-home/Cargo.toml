@@ -1,25 +1,12 @@
 [package]
 name = "dxm-home"
 version = "0.1.6"
+description = "Manage dxm installations."
+categories = ["filesystem", "web-programming::http-client"]
 authors.workspace = true
 edition.workspace = true
 rust-version.workspace = true
-description = "Crate for installing and updating dxm."
 repository.workspace = true
 license.workspace = true
-include.workspace = true
-
-[dependencies]
-dirs.workspace = true
-flate2.workspace = true
-fs-err.workspace = true
-log.workspace = true
-reqwest = { workspace = true, features = ["json"] }
-self-replace.workspace = true
-serde.workspace = true
-tar.workspace = true
-tempfile.workspace = true
-zip.workspace = true
-
-[target.'cfg(windows)'.dependencies]
-winreg.workspace = true
+keywords.workspace = true
+exclude.workspace = true

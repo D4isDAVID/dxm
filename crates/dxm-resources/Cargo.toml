@@ -1,23 +1,12 @@
 [package]
 name = "dxm-resources"
 version = "0.3.0"
+description = "Download & install third-party FXServer resources."
+categories = ["web-programming::http-client"]
 authors.workspace = true
 edition.workspace = true
 rust-version.workspace = true
-description = "Crate for installing third-party resources for FXServer."
 repository.workspace = true
 license.workspace = true
-include.workspace = true
-
-[dependencies]
-dirs.workspace = true
-fs-err.workspace = true
-fs_extra.workspace = true
-git2 = { workspace = true, features = ["ssh", "https"] }
-log.workspace = true
-reqwest = { workspace = true, features = ["json"] }
-serde.workspace = true
-serde_json.workspace = true
-tempfile.workspace = true
-url.workspace = true
-zip.workspace = true
+keywords.workspace = true
+exclude.workspace = true

@@ -1,8 +1,8 @@
 [package]
-name = "dxm-manifest"
-version = "0.5.1"
-description = "Manifest structures for dxm."
-categories = ["data-structures"]
+name = "dxm-core"
+version = "0.1.0"
+description = "Manage FXServer artifacts & resources."
+categories = ["filesystem", "web-programming::http-client"]
 authors.workspace = true
 edition.workspace = true
 rust-version.workspace = true

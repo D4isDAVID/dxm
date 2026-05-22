@@ -1,3 +1,3 @@
 # dxm-home
 
-Crate for installing and updating dxm.
+Manage dxm installations.

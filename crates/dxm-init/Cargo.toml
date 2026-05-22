@@ -1,26 +1,12 @@
 [package]
 name = "dxm-init"
 version = "0.3.0"
+description = "Basic templates for FXServer."
+categories = ["filesystem"]
 authors.workspace = true
 edition.workspace = true
 rust-version.workspace = true
-description = "Crate for initializing FXServer data directories."
 repository.workspace = true
 license.workspace = true
-include = [
-  "src",
-  "templates",
-  "CHANGELOG.md",
-  "LICENSE",
-  "README.md"
-]
-
-[dependencies]
-dxm-manifest.workspace = true
-fs-err.workspace = true
-git2.workspace = true
-log.workspace = true
-serde.workspace = true
-
-[dev-dependencies]
-tempfile.workspace = true
+keywords.workspace = true
+exclude.workspace = true
