@@ -9,9 +9,3 @@ rust-version.workspace = true
 repository.workspace = true
 license.workspace = true
 keywords.workspace = true
-
-[profile.release]
-opt-level = "z"
-strip = "symbols"
-lto = "fat"
-codegen-units = 1

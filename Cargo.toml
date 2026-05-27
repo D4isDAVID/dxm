@@ -32,3 +32,9 @@ tokio = "1.52.3"
 tokio-util = "0.7.18"
 tracing = "0.1.44"
 wiremock = "0.6.5"
+
+[profile.release]
+opt-level = "z"
+strip = "symbols"
+lto = "fat"
+codegen-units = 1
