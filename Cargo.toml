@@ -9,11 +9,14 @@ rust-version = "1.85"
 repository = "https://github.com/D4isDAVID/dxm"
 license = "MIT"
 keywords = ["fivem", "redm", "fxserver", "cfx", "citizenfx"]
-exclude = [
-  "tests"
-]
 
 [workspace.dependencies]
+async-compression = { version = "0.4.42", features = ["tokio"] }
+async-tar = { version = "0.6.0", default-features = false, features = ["runtime-tokio", "xattr"] }
+async-tempfile = "0.7.0"
+async_zip = "0.0.18"
+bytes = "1.11.1"
+chrono = { version = "0.4.44", features = ["serde"] }
 dxm = { path = "./crates/dxm", version = "0.3.1" }
 dxm-artifacts = { path = "./crates/dxm-artifacts", version = "0.3.0" }
 dxm-core = { path = "./crates/dxm-core", version = "0.1.0" }
@@ -21,3 +24,11 @@ dxm-home = { path = "./crates/dxm-home", version = "0.1.6" }
 dxm-init = { path = "./crates/dxm-init", version = "0.3.0" }
 dxm-manifest = { path = "./crates/dxm-manifest", version = "0.5.1" }
 dxm-resources = { path = "./crates/dxm-resources", version = "0.3.0" }
+reqwest = { version = "0.13.3", default-features = false, features = ["http2", "native-tls", "charset", "system-proxy", "json"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+thiserror = "2.0.18"
+tokio = "1.52.3"
+tokio-util = "0.7.18"
+tracing = "0.1.44"
+wiremock = "0.6.5"

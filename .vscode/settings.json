@@ -2,5 +2,6 @@
   "editor.defaultFormatter": "rust-lang.rust-analyzer",
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",
-  "rust-analyzer.cargo.features": "all"
+  "rust-analyzer.cargo.features": "all",
+  "rust-analyzer.imports.prefix": "crate"
 }
