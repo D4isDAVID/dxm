@@ -24,6 +24,12 @@ pub struct Template {
     files: Vec<(PathBuf, Vec<u8>)>,
 }
 
+impl Default for Template {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Template {
     /// Creates and returns a new [`Template`] with no files.
     pub fn new() -> Self {
@@ -41,7 +47,7 @@ impl Template {
     /// Adds a new file to the template with the given destination path and
     /// content. The given destination path must not go out of the base path
     /// or [`Self::write`] will return an error.
-    pub fn add_file(&mut self, dest_path: impl Into<PathBuf>, content: impl Into<Vec<u8>>) -> () {
+    pub fn add_file(&mut self, dest_path: impl Into<PathBuf>, content: impl Into<Vec<u8>>) {
         self.files.push((dest_path.into(), content.into()));
     }
 

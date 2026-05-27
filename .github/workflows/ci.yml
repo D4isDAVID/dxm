@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - '**'
+      - "**"
   pull_request:
 
 permissions:
@@ -21,7 +21,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Lint
-        run: cargo clippy --verbose --locked --workspace --all-targets
+        run: cargo clippy --verbose --locked --workspace --all-targets -- -D clippy::all
 
   format:
     name: Format

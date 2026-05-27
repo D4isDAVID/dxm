@@ -37,7 +37,7 @@ pub fn base_template() -> Template {
 /// - `./data/.gitignore`: Data gitignore for cache and environment files.
 /// - `./data/env.cfg.template`: Template for the gitignored `./data/env.cfg`.
 /// - `./data/secrets.cfg.template`: Template for the gitignored
-///     `./data/secrets.cfg`.
+///   `./data/secrets.cfg`.
 /// - `./.gitignore`: Root gitignore for artifacts and txData.
 pub fn git_template() -> Template {
     base_template()
