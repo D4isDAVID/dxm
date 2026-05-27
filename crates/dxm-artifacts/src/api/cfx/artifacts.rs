@@ -66,7 +66,9 @@ pub enum ExtractError {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum ArtifactsPlatform {
+    /// Fetch from Artifacts job [`build_server_windows`](https://runtime.fivem.net/artifacts/fivem/build_server_windows/master).
     Windows,
+    /// Fetch from Artifacts job [`build_proot_linux`](https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master).
     Linux,
 }
 

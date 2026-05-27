@@ -45,7 +45,7 @@ pub enum ArtifactsError {
     /// [`Artifacts::download`] returned an error when writing files.
     #[error("io error: {0}")]
     Io(#[from] io::Error),
-    // [`Artifacts::install`] returned an error when extracting artifacts.
+    /// [`Artifacts::install`] returned an error when extracting artifacts.
     #[error("failed to extract artifacts: {0}")]
     Extract(#[from] ExtractError),
 }
