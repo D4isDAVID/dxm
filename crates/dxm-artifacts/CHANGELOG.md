@@ -9,6 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+### Added
+
+- `Artifacts` struct to resolve, fetch, download and install FXServer builds.
+- `ArtifactsError` enum containing possible errors.
+- `ArtifactsResult` utility type.
+- `ArtifactsPlatform` enum containing possible FXServer platforms.
+- `BuildVersion` enum containing possible resolvable FXServer versions.
+- `Build` struct representing a resolved FXServer build.
+- `BuildIssue` enum containing possible issues with an FXServer build.
+
+### Changed
+
+- **Breaking:** all blocking functions are now asynchronous.
+- **Breaking:** all functions returning `Result<_, Box<dyn Error>>` now return
+  proper error types.
+
+### Removed
+
+- **Breaking:** `download` - use `Artifacts::download` instead.
+- **Breaking:** `install` - use `Artifacts::install` instead.
+- **Breaking:** `cfx`, `jg` and `cfx` modules - use the top level structs and
+  `Artifacts::resolve` instead.
+
 ## 0.3.0 - 2026-05-18
 
 [dxm 0.3.0]

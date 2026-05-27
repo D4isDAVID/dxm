@@ -1,6 +1,8 @@
 use crate::Template;
 
-/// Creates and returns a [`Template`] containing the following files:
+/// Creates and returns a default base [`Template`].
+///
+/// Contains the following files:
 ///
 /// - `./data/env.cfg`: Environment configuration.
 /// - `./data/permissions.cfg`: ACE permissions configuration.
@@ -31,8 +33,9 @@ pub fn base_template() -> Template {
         )
 }
 
-/// Creates and returns a [`Template`] containing the files from
-/// [`base_template`], and the following files:
+/// Creates and returns a default [`Template`] for Git.
+///
+/// Contains the files from [`base_template`], and the following files:
 ///
 /// - `./data/.gitignore`: Data gitignore for cache and environment files.
 /// - `./data/env.cfg.template`: Template for the gitignored `./data/env.cfg`.

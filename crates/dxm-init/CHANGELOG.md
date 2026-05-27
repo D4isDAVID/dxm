@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+### Added
+
+- `Template` struct to create new templates.
+- `TemplateError` enum containing possible errors.
+- `TemplateResult` utility type.
+- `base_template` function to create a default base template.
+- `git_template` function to create a default template for Git.
+
+### Changed
+
+- **Breaking:** all blocking functions are now asynchronous.
+- **Breaking:** all functions returning `Result<_, Box<dyn Error>>` now return
+  proper error types.
+
+### Removed
+
+- **Breaking::** `server` function - use `base_template` instead.
+- **Breaking::** `vcs` module - use `git_template` instead.
+- **Breaking:** constants `ENV_CFG_NAME`, `PERMISSIONS_CFG_NAME`,
+  `README_NAME`, `RESOURCES_CFG_NAME`, `SECRETS_CFG_NAME`, `SERVER_CFG_NAME`,
+  `TXDATA_CONFIG_NAME`, `TXDATA_DEFAULT_PROFILE` and `TXDATA_DIR`.
+
 ## 0.3.0 - 2026-05-18
 
 [dxm 0.3.0]
