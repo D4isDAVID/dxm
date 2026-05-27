@@ -9,7 +9,6 @@ rust-version.workspace = true
 repository.workspace = true
 license.workspace = true
 keywords.workspace = true
-exclude.workspace = true
 
 [profile.release]
 opt-level = "z"
