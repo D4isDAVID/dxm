@@ -5,12 +5,14 @@
 use std::path::Path;
 
 use async_compression::tokio::bufread::XzDecoder;
-use async_zip::{error::ZipError, tokio::read::seek::ZipFileReader};
+use async_zip::tokio::read::seek::ZipFileReader;
 use tokio::{
     fs,
     io::{self, AsyncBufRead, AsyncSeek, AsyncWriteExt},
 };
 use tokio_util::compat::FuturesAsyncReadCompatExt;
+
+use crate::error::ExtractError;
 
 /// The base URL for Cfx.re's Runtime Artifacts storage.
 pub const BASE_URL: &str = "https://runtime.fivem.net/artifacts";
@@ -52,14 +54,6 @@ pub fn fxserver_endpoint(
         commit_sha.as_ref(),
         platform.archive_name()
     )
-}
-
-#[derive(Debug, thiserror::Error)]
-#[error(transparent)]
-#[non_exhaustive]
-pub enum ExtractError {
-    Zip(#[from] ZipError),
-    Io(#[from] io::Error),
 }
 
 /// The platforms for which FXServer can be downloaded.
@@ -114,6 +108,17 @@ impl ArtifactsPlatform {
         &self,
         reader: impl AsyncBufRead + AsyncSeek + Unpin,
         dest_path: impl AsRef<Path>,
+    ) -> crate::Result<()> {
+        self.extract_internal(reader, dest_path).await?;
+
+        Ok(())
+    }
+
+    /// Utility function for supplying the correct error type for [`Self::extract`].
+    async fn extract_internal(
+        &self,
+        reader: impl AsyncBufRead + AsyncSeek + Unpin,
+        dest_path: impl AsRef<Path>,
     ) -> Result<(), ExtractError> {
         let dest_path = dest_path.as_ref();
 
@@ -133,8 +138,6 @@ impl ArtifactsPlatform {
                     let outpath = dest_path.join(filename);
 
                     if entry.dir()? {
-                        fs::create_dir_all(outpath).await?;
-
                         continue;
                     }
 
@@ -143,7 +146,6 @@ impl ArtifactsPlatform {
                     }
 
                     let mut outfile = fs::File::create(&outpath).await?;
-
                     io::copy(&mut reader.compat(), &mut outfile).await?;
                     outfile.flush().await?;
                 }

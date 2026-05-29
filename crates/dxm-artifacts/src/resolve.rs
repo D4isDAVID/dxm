@@ -1,57 +1,17 @@
 //! Contains interfaces for resolving FXServer build versions and fetching
 //! FXServer build archives.
 
-use std::path::Path;
-use std::{fmt::Debug, io::Cursor};
+use std::fmt::Debug;
 
 use bytes::Bytes;
-use reqwest::header::{AUTHORIZATION, HeaderValue, InvalidHeaderValue};
-use tokio::{fs, io};
+use futures_core::stream::BoxStream;
+use reqwest::header::{AUTHORIZATION, HeaderValue};
 
 use crate::{
-    api::{ApiClient, ArtifactsPlatform, ExtractError, authorization_token},
+    api::{ApiClient, ArtifactsPlatform, authorization_token},
     build::{Build, BuildIssue, BuildVersion},
+    error::FetchError,
 };
-
-/// Errors that may occur in [`Artifacts`] methods.
-#[derive(Debug, thiserror::Error)]
-pub enum ArtifactsError {
-    /// [`Artifacts::new`] returned an error.
-    #[error("failed to initialize artifacts client: {0}")]
-    Init(#[source] reqwest::Error),
-    /// [`Artifacts::new`] returned an error.
-    #[error("failed to insert artifacts header: {0}")]
-    Header(#[from] InvalidHeaderValue),
-    /// [`Artifacts::resolve`] returned an error when fetching the JG Scripts
-    /// Artifacts DB.
-    #[error("failed to fetch jg scripts artifacts db: {0}")]
-    JgArtifactsDb(#[source] reqwest::Error),
-    /// [`Artifacts::resolve`] returned an error when fetching Cfx.re's FXServer
-    /// version changelog.
-    #[error("failed to fetch cfx version changelog: {0}")]
-    CfxServerVersions(#[source] reqwest::Error),
-    /// [`Artifacts::resolve`] or [`Artifacts::fetch`] returned an error when
-    /// fetching Cfx.re's Artifacts storage.
-    #[error("failed to fetch cfx artifacts: {0}")]
-    CfxArtifacts(#[source] reqwest::Error),
-    /// [`Artifacts::resolve`] returned an error when fetching GitHub's Git
-    /// Reference API.
-    #[error("failed to fetch github git ref: {0}")]
-    GithubGitRef(#[source] reqwest::Error),
-    /// [`Artifacts::resolve`] returned an error when fetching GitHub's Git Tags
-    /// API.
-    #[error("failed to fetch github git tag: {0}")]
-    GithubGitTag(#[source] reqwest::Error),
-    /// [`Artifacts::download`] returned an error when writing files.
-    #[error("io error: {0}")]
-    Io(#[from] io::Error),
-    /// [`Artifacts::install`] returned an error when extracting artifacts.
-    #[error("failed to extract artifacts: {0}")]
-    Extract(#[from] ExtractError),
-}
-
-/// Utility type for returning the given type or an [`ArtifactsError`].
-pub type ArtifactsResult<T> = Result<T, ArtifactsError>;
 
 /// The main interface for resolving & downloading FXServer builds.
 #[derive(Debug, Clone)]
@@ -65,9 +25,9 @@ impl Artifacts {
     /// [`reqwest::Client`] and default API URLs.
     ///
     /// See [`Self::with_client`].
-    pub fn new() -> ArtifactsResult<Self> {
+    pub fn new() -> crate::Result<Self> {
         Ok(Self {
-            client: ApiClient::new().map_err(ArtifactsError::Init)?,
+            client: ApiClient::new().map_err(crate::Error::Init)?,
         })
     }
 
@@ -106,7 +66,7 @@ impl Artifacts {
 
     /// Runs [`reqwest::header::HeaderMap::insert`] with the given data for
     /// GitHub's Repository REST API.
-    pub fn set_github_pat_token(&mut self, token: impl AsRef<str>) -> ArtifactsResult<()> {
+    pub fn set_github_pat_token(&mut self, token: impl AsRef<str>) -> crate::Result<()> {
         self.client.github_repos_api.headers.insert(
             AUTHORIZATION,
             HeaderValue::from_str(&authorization_token(token))?,
@@ -119,18 +79,18 @@ impl Artifacts {
     /// resolves any possible [`BuildIssue`]s, wraps them in a new
     /// [`Build`] and returns it.
     #[tracing::instrument(name = "resolve_artifacts", skip(self))]
-    pub async fn resolve(&self, version: &BuildVersion) -> ArtifactsResult<Build> {
+    pub async fn resolve(&self, version: &BuildVersion) -> crate::Result<Build> {
         let artifacts_db = self
             .client
             .jg_artifacts_db_json()
             .await
-            .map_err(ArtifactsError::JgArtifactsDb)?;
+            .map_err(FetchError::JgArtifactsDb)?;
 
         let server_versions = self
             .client
             .cfx_server_versions()
             .await
-            .map_err(ArtifactsError::CfxServerVersions)?;
+            .map_err(FetchError::CfxServerVersions)?;
 
         let number = match version {
             BuildVersion::BuildNumber(build) => build.clone(),
@@ -145,12 +105,12 @@ impl Artifacts {
             .client
             .github_git_ref(tag_ref)
             .await
-            .map_err(ArtifactsError::GithubGitRef)?;
+            .map_err(FetchError::GithubGitRef)?;
         let tag = self
             .client
             .github_git_tag(tag_ref.object.sha)
             .await
-            .map_err(ArtifactsError::GithubGitTag)?;
+            .map_err(FetchError::GithubGitTag)?;
 
         let commit_sha = tag.object.sha;
         tracing::debug!(commit_sha = commit_sha, "resolved build commit");
@@ -188,7 +148,7 @@ impl Artifacts {
                 .client
                 .check_cfx_artifacts(platform, &number, &commit_sha)
                 .await
-                .map_err(ArtifactsError::CfxArtifacts)?
+                .map_err(FetchError::CfxArtifacts)?
             {
                 issues.push(BuildIssue::UnsupportedPlatform(platform));
 
@@ -203,63 +163,30 @@ impl Artifacts {
         Ok(Build::new(number, commit_sha, issues))
     }
 
-    /// Fetches the given [`Build`] archive for the given [`ArtifactsPlatform`],
-    /// and returns it as [`bytes::Bytes`].
+    /// Fetches the given [`Build`] archive for the compiled platform, and
+    /// returns the content bytes stream, and the content length if available.
     pub async fn fetch(
         &self,
         build: &Build,
+    ) -> crate::Result<(BoxStream<'static, reqwest::Result<Bytes>>, Option<u64>)> {
+        self.fetch_platform(build, ArtifactsPlatform::default())
+            .await
+    }
+
+    /// Fetches the given [`Build`] archive for the given [`ArtifactsPlatform`],
+    /// and returns the content bytes stream, and the content length if
+    /// available.
+    pub async fn fetch_platform(
+        &self,
+        build: &Build,
         platform: ArtifactsPlatform,
-    ) -> ArtifactsResult<Bytes> {
-        let bytes = self
+    ) -> crate::Result<(BoxStream<'static, reqwest::Result<Bytes>>, Option<u64>)> {
+        let result = self
             .client
             .cfx_artifacts(platform, build.number(), build.commit_sha())
             .await
-            .map_err(ArtifactsError::CfxArtifacts)?;
+            .map_err(FetchError::CfxArtifacts)?;
 
-        Ok(bytes)
-    }
-
-    /// Fetches the given [`Build`] archive for the given [`ArtifactsPlatform`],
-    /// and writes it in the given path.
-    #[tracing::instrument(name = "download_artifacts", skip(self), fields(build = build.number()))]
-    pub async fn download(
-        &self,
-        build: &Build,
-        platform: ArtifactsPlatform,
-        path: impl AsRef<Path> + Debug,
-    ) -> ArtifactsResult<()> {
-        let path = path.as_ref();
-
-        let bytes = self.fetch(build, platform).await?;
-
-        if let Some(parent) = path.parent() {
-            fs::create_dir_all(parent).await?;
-        }
-
-        fs::write(path, bytes).await?;
-
-        Ok(())
-    }
-
-    /// Fetches the given [`Build`] archive for the given [`ArtifactsPlatform`],
-    /// and extracts it in the given path.
-    #[tracing::instrument(name = "install_artifacts", skip(self), fields(build = build.number()))]
-    pub async fn install(
-        &self,
-        build: &Build,
-        platform: ArtifactsPlatform,
-        path: impl AsRef<Path> + Debug,
-    ) -> ArtifactsResult<()> {
-        let path = path.as_ref();
-
-        let bytes = self.fetch(build, platform).await?;
-
-        if let Some(parent) = path.parent() {
-            fs::create_dir_all(parent).await?;
-        }
-
-        platform.extract(Cursor::new(bytes), path).await?;
-
-        Ok(())
+        Ok(result)
     }
 }

@@ -2,16 +2,15 @@
 //! downloading FXServer builds.
 
 use bytes::Bytes;
+use futures_core::stream::BoxStream;
+use futures_util::StreamExt;
 use reqwest::{
-    Client, ClientBuilder, Method, Response, StatusCode,
-    header::{self, HeaderMap, HeaderValue, USER_AGENT},
+    Client, Method, Response, StatusCode,
+    header::{self, HeaderMap, HeaderValue},
 };
 use serde::de::DeserializeOwned;
 
-pub use crate::api::{
-    cfx::artifacts::{ArtifactsPlatform, ExtractError},
-    github::authorization_token,
-};
+pub use crate::api::{cfx::artifacts::ArtifactsPlatform, github::authorization_token};
 use crate::api::{
     cfx::{
         artifacts::{self},
@@ -68,7 +67,7 @@ impl ApiClient {
     ///
     /// See [`Self::with_client`].
     pub fn new() -> reqwest::Result<Self> {
-        Ok(Self::with_client(ClientBuilder::new().build()?))
+        Ok(Self::with_client(Client::builder().build()?))
     }
 
     /// Creates and returns a new [`ApiClient`] with the given [`Client`] and
@@ -138,21 +137,24 @@ impl ApiClient {
     }
 
     /// Makes a `GET` request to Cfx.re's Artifacts storage, and returns the
-    /// results as [`Bytes`]`.
+    /// content bytes stream, and the content length if available.
     #[tracing::instrument(name = "fetch_artifacts", skip(self, commit_sha), fields(number = number.as_ref()))]
     pub async fn cfx_artifacts(
         &self,
         platform: ArtifactsPlatform,
         number: impl AsRef<str>,
         commit_sha: impl AsRef<str>,
-    ) -> reqwest::Result<Bytes> {
-        self.get(
-            &self.cfx_artifacts,
-            artifacts::fxserver_endpoint(platform, number, commit_sha),
-        )
-        .await?
-        .bytes()
-        .await
+    ) -> reqwest::Result<(BoxStream<'static, reqwest::Result<Bytes>>, Option<u64>)> {
+        let response = self
+            .get(
+                &self.cfx_artifacts,
+                artifacts::fxserver_endpoint(platform, number, commit_sha),
+            )
+            .await?;
+
+        let length = response.content_length();
+
+        Ok((response.bytes_stream().boxed(), length))
     }
 
     /// Makes a `HEAD` request to Cfx.re's Artifacts storage, and returns
@@ -220,6 +222,9 @@ impl ApiClient {
 
     /// Creates and returns a [`RequestBuilder`] with the given method,
     /// [`ApiData`] and endpoint.
+    ///
+    /// If a `User-Agent` is not already supplied in the request, then a default
+    /// will be filled in.
     async fn request(
         &self,
         method: Method,
@@ -239,8 +244,11 @@ impl ApiClient {
             .build()?;
 
         let headers = request.headers_mut();
-        if !headers.contains_key(USER_AGENT) {
-            headers.insert(USER_AGENT, HeaderValue::from_static(USER_AGENT_VALUE));
+        if !headers.contains_key(header::USER_AGENT) {
+            headers.insert(
+                header::USER_AGENT,
+                HeaderValue::from_static(USER_AGENT_VALUE),
+            );
         }
 
         self.client.execute(request).await

@@ -30,10 +30,16 @@
 //! [linux]: https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master
 //! [changelogs api]: https://changelogs-live.fivem.net/api/changelog/versions/win32/server
 
+#![deny(clippy::all)]
+#![deny(missing_docs)]
+
 mod api;
+mod archive;
 mod build;
+mod error;
 mod resolve;
 
 pub use crate::api::ArtifactsPlatform;
 pub use crate::build::{Build, BuildIssue, BuildVersion};
-pub use crate::resolve::{Artifacts, ArtifactsError, ArtifactsResult};
+pub use crate::error::{Error, Result};
+pub use crate::resolve::Artifacts;

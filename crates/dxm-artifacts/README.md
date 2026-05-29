@@ -14,8 +14,7 @@ the JG Scripts [Artifacts DB].
 ## Usage
 
 This crate uses [`tracing`] for logging, and is built with [`tokio`] and
-[`reqwest`] in mind. If you require support for other runtimes, feel free to
-open an issue on the [GitHub Repository].
+[`reqwest`] in mind.
 
 To install the crate as a dependency, add the following to your `Cargo.toml`:
 

@@ -21,7 +21,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Lint
-        run: cargo clippy --verbose --locked --workspace --all-targets -- -D clippy::all
+        run: cargo clippy --verbose --locked --workspace --all-targets
 
   format:
     name: Format

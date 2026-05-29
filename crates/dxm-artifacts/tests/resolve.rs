@@ -1,8 +1,8 @@
 use std::io::Cursor;
 
-use async_tempfile::{TempDir, TempFile};
+use async_tempfile::TempDir;
 use dxm_artifacts::*;
-use tokio::{fs, io::BufReader};
+use tokio::fs;
 use wiremock::MockServer;
 
 use crate::mocks::*;
@@ -71,46 +71,21 @@ async fn should_resolve_latest_jg_build() {
 
 #[tokio::test]
 async fn should_fetch_windows() {
-    let (resolver, build, _) = setup_windows_resolver().await;
+    let platform = ArtifactsPlatform::Windows;
+
+    let (resolver, build, length, _) = setup_archive_resolver(platform).await;
     let dir = TempDir::new().await.unwrap();
 
-    let platform = ArtifactsPlatform::Windows;
-    let bytes = resolver.fetch(&build, platform).await.unwrap();
-    platform.extract(Cursor::new(bytes), &dir).await.unwrap();
+    let result = resolver.fetch(&build, platform).await.unwrap();
+    platform.extract(result.0, &dir).await.unwrap();
 
-    assert_extract_contents(&dir).await;
-}
-
-#[tokio::test]
-async fn should_download_windows() {
-    let (resolver, build, _) = setup_windows_resolver().await;
-    let file = TempFile::new().await.unwrap();
-    let dir = TempDir::new().await.unwrap();
-
-    let platform = ArtifactsPlatform::Windows;
-    resolver
-        .download(&build, platform, file.file_path())
-        .await
-        .unwrap();
-    platform.extract(BufReader::new(file), &dir).await.unwrap();
-
-    assert_extract_contents(&dir).await;
-}
-
-#[tokio::test]
-async fn should_install_windows() {
-    let (resolver, build, _) = setup_windows_resolver().await;
-    let dir = TempDir::new().await.unwrap();
-
-    let platform = ArtifactsPlatform::Windows;
-    resolver.install(&build, platform, &dir).await.unwrap();
-
+    assert_eq!(result.1, Some(length));
     assert_extract_contents(&dir).await;
 }
 
 #[tokio::test]
 async fn should_fetch_linux() {
-    let (resolver, build, _) = setup_linux_resolver().await;
+    let (resolver, build, length, _) = setup_archive_resolver(ArtifactsPlatform::Linux).await;
     let dir = TempDir::new().await.unwrap();
 
     let platform = ArtifactsPlatform::Linux;
@@ -120,61 +95,29 @@ async fn should_fetch_linux() {
     assert_extract_contents(&dir).await;
 }
 
-#[tokio::test]
-async fn should_download_linux() {
-    let (resolver, build, _) = setup_linux_resolver().await;
-    let file = TempFile::new().await.unwrap();
-    let dir = TempDir::new().await.unwrap();
-
-    let platform = ArtifactsPlatform::Linux;
-    resolver
-        .download(&build, platform, file.file_path())
-        .await
-        .unwrap();
-    platform.extract(BufReader::new(file), &dir).await.unwrap();
-
-    assert_extract_contents(&dir).await;
-}
-
-#[tokio::test]
-async fn should_install_linux() {
-    let (resolver, build, _) = setup_linux_resolver().await;
-    let dir = TempDir::new().await.unwrap();
-
-    let platform = ArtifactsPlatform::Linux;
-    resolver.install(&build, platform, &dir).await.unwrap();
-
-    assert_extract_contents(&dir).await;
-}
-
-async fn setup_windows_resolver() -> (Artifacts, Build, MockServer) {
+async fn setup_archive_resolver(
+    platform: ArtifactsPlatform,
+) -> (Artifacts, Build, u64, MockServer) {
     let version = BuildVersion::LatestJg;
     let build_number = "2";
 
     let (resolver, server) = setup_resolver(build_number).await;
 
-    let archive = setup_windows_archive().await;
+    let archive = match platform {
+        ArtifactsPlatform::Windows => setup_windows_archive().await,
+        ArtifactsPlatform::Linux => setup_linux_archive().await,
+        _ => unreachable!(),
+    };
+
+    let contents = fs::read(archive.file_path()).await.unwrap();
+    let length = contents.len() as u64;
+
     let server = server
-        .with_cfx_artifacts_windows(build_number, fs::read(archive.file_path()).await.unwrap())
+        .with_cfx_artifacts_windows(build_number, contents)
         .await;
     let build = resolver.resolve(&version).await.unwrap();
 
-    (resolver, build, server)
-}
-
-async fn setup_linux_resolver() -> (Artifacts, Build, MockServer) {
-    let version = BuildVersion::LatestJg;
-    let build_number = "2";
-
-    let (resolver, server) = setup_resolver(build_number).await;
-
-    let archive = setup_linux_archive().await;
-    let server = server
-        .with_cfx_artifacts_linux(build_number, fs::read(archive.file_path()).await.unwrap())
-        .await;
-    let build = resolver.resolve(&version).await.unwrap();
-
-    (resolver, build, server)
+    (resolver, build, length, server)
 }
 
 async fn setup_resolver(build_number: &str) -> (Artifacts, MockServer) {

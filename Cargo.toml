@@ -24,6 +24,8 @@ dxm-home = { path = "./crates/dxm-home", version = "0.1.6" }
 dxm-init = { path = "./crates/dxm-init", version = "0.3.0" }
 dxm-manifest = { path = "./crates/dxm-manifest", version = "0.5.1" }
 dxm-resources = { path = "./crates/dxm-resources", version = "0.3.0" }
+futures-core = "0.3.32"
+futures-util = "0.3.32"
 reqwest = { version = "0.13.3", default-features = false, features = ["http2", "native-tls", "charset", "system-proxy", "json"] }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
