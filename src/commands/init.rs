@@ -24,7 +24,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
 
     let path = std::env::current_dir()?;
 
-    crate::util::init::server(path, vcs)?;
+    crate::util::init::server(path, vcs, None)?;
 
     Ok(())
 }
