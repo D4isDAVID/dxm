@@ -26,15 +26,15 @@ where
     if let Some(artifact_path) = artifact_path {
         manifest.artifact.set_path("", &artifact_path)?;
         manifest.write_artifact(&manifest_path)?;
-    } else {
-        crate::util::artifacts::install(
-            &client,
-            &platform,
-            &manifest_path,
-            &manifest,
-            &mut lockfile,
-        )?;
     }
+
+    crate::util::artifacts::install(
+        &client,
+        &platform,
+        &manifest_path,
+        &manifest,
+        &mut lockfile,
+    )?;
 
     crate::util::resources::install(&client, &manifest_path, &manifest, &mut lockfile)?;
     lockfile.write(manifest_path)?;
