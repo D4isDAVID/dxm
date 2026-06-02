@@ -18,7 +18,7 @@ pub fn cli() -> Command {
         )
         .arg(
             Arg::new("artifact")
-                .help("The path to an existing artifact to extend")
+                .help("An optional custom path to install artifacts in")
                 .long("artifact")
                 .value_parser(clap::value_parser!(PathBuf)),
         )
@@ -35,7 +35,7 @@ pub fn cli() -> Command {
 pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let path = args.get_one::<PathBuf>("path").expect("no path");
     let vcs = args.get_one::<VcsOption>("vcs").expect("no vcs");
-    let artifact = args.get_one::<PathBuf>("artifact").cloned();
+    let artifact = args.get_one::<PathBuf>("artifact");
 
     crate::util::init::server(path, vcs, artifact)?;
 

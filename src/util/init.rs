@@ -2,9 +2,13 @@ use std::{error::Error, path::Path, path::PathBuf};
 
 use dxm_artifacts::cfx::ArtifactsPlatform;
 use dxm_init::vcs::VcsOption;
-use dxm_manifest::{lockfile::Lockfile, sourcefile};
+use dxm_manifest::lockfile::Lockfile;
 
-pub fn server<P>(path: P, vcs: &VcsOption, artifact: Option<PathBuf>) -> Result<(), Box<dyn Error>>
+pub fn server<P>(
+    path: P,
+    vcs: &VcsOption,
+    artifact_path: Option<&PathBuf>,
+) -> Result<(), Box<dyn Error>>
 where
     P: AsRef<Path>,
 {
@@ -19,23 +23,10 @@ where
     let client = crate::util::reqwest::github_client().build()?;
     let platform = ArtifactsPlatform::default();
 
-    if let Some(artifact) = artifact {
-        manifest.artifact.set_path("", &artifact)?;
-
-        if let Some(version) = sourcefile::read(&artifact)? {
-            manifest.artifact.set_version(version.clone());
-            lockfile.set_artifact_version(version);
-        }
-
+    if let Some(artifact_path) = artifact_path {
+        manifest.artifact.set_path("", &artifact_path)?;
         manifest.write_artifact(&manifest_path)?;
     } else {
-        crate::util::artifacts::update(
-            &client,
-            &platform,
-            &manifest_path,
-            &manifest,
-            &mut lockfile,
-        )?;
         crate::util::artifacts::install(
             &client,
             &platform,
@@ -46,7 +37,6 @@ where
     }
 
     crate::util::resources::install(&client, &manifest_path, &manifest, &mut lockfile)?;
-
     lockfile.write(manifest_path)?;
 
     Ok(())
