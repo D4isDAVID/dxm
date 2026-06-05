@@ -82,7 +82,10 @@ where
 {
     let path = path.as_ref();
 
-    fs_err::copy(path, path.with_added_extension(TEMPLATE_EXTENSION))
+    let mut dest = path.to_owned();
+    dest.add_extension(TEMPLATE_EXTENSION);
+
+    fs_err::copy(path, dest)
 }
 
 #[cfg(test)]

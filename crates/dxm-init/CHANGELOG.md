@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+### Changed
+
+- Changed `Path::with_added_extension` calls to `PathBuf::add_extension` in
+  internal implementations.
+
 ## 0.3.0 - 2026-05-18
 
 [dxm 0.3.0]

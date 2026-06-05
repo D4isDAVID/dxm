@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [unreleased diff]
 
+### Added
+
+- Supplying custom artifacts path on init with `dxm init --artifact <path>` and
+  `dxm new --artifact <path>`.
+
 ## [0.3.1] - 2026-05-20
 
 [0.3.1 diff]
