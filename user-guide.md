@@ -271,7 +271,7 @@ dxm patch remove <resource>
 
 ## Managing Monitor
 
-To install a third-party txAdmin replacement, use:
+To install a txAdmin version replacement, use:
 
 ```
 dxm monitor install <url>
@@ -280,13 +280,13 @@ dxm monitor install <url>
 This will replace the `monitor` system resource in the artifacts and add it to
 the manifest file.
 
-To update the third-party txAdmin replacement, use:
+To update the txAdmin version replacement, use:
 
 ```sh
 dxm update --monitor
 ```
 
-To remove the third-party txAdmin replacement, use:
+To remove the txAdmin version replacement, use:
 
 ```sh
 dxm monitor remove
@@ -295,7 +295,7 @@ dxm monitor remove
 ### Examples
 
 ```sh
-dxm monitor install https://github.com/SomeAussieGaymer/fxPanel
+dxm monitor install https://github.com/citizenfx/txAdmin/releases/tag/v8.1.0
 ```
 
 ## Installing and Updating a dxm-Managed Server
