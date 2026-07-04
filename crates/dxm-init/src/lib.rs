@@ -47,9 +47,9 @@ where
     );
 
     manifest.write(path)?;
+    fs_err::write(path.join(README_NAME), README)?;
 
     fs_err::create_dir_all(manifest.server.resources(path))?;
-    fs_err::write(data_path.join(README_NAME), README)?;
     fs_err::write(data_path.join(ENV_CFG_NAME), ENV_CFG)?;
     fs_err::write(data_path.join(PERMISSIONS_CFG_NAME), PERMISSIONS_CFG)?;
     fs_err::write(data_path.join(RESOURCES_CFG_NAME), RESOURCES_CFG)?;
@@ -57,7 +57,6 @@ where
     fs_err::write(data_path.join(SERVER_CFG_NAME), SERVER_CFG)?;
 
     let txdata_default_path = path
-        .join(path)
         .join(TXDATA_DIR)
         .join(TXDATA_DEFAULT_PROFILE);
 

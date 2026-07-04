@@ -63,7 +63,7 @@ impl VcsOption {
             VcsOption::Git => {
                 Repository::init(path)?;
 
-                fs_err::write(crate::README_NAME, GIT_README)?;
+                fs_err::write(path.join(crate::README_NAME), GIT_README)?;
                 fs_err::write(path.join(GITIGNORE_NAME), ROOT_GITIGNORE)?;
                 fs_err::write(data_path.join(GITIGNORE_NAME), DATA_GITIGNORE)?;
 
