@@ -56,9 +56,7 @@ where
     fs_err::write(data_path.join(SECRETS_CFG_NAME), SECRETS_CFG)?;
     fs_err::write(data_path.join(SERVER_CFG_NAME), SERVER_CFG)?;
 
-    let txdata_default_path = path
-        .join(TXDATA_DIR)
-        .join(TXDATA_DEFAULT_PROFILE);
+    let txdata_default_path = path.join(TXDATA_DIR).join(TXDATA_DEFAULT_PROFILE);
 
     fs_err::create_dir_all(&txdata_default_path)?;
     fs_err::write(

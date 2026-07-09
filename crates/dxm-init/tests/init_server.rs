@@ -1,4 +1,4 @@
-use dxm_init::{ENV_CFG_NAME, PERMISSIONS_CFG_NAME, README_NAME, RESOURCES_CFG_NAME, SECRETS_CFG_NAME, SERVER_CFG_NAME, TXDATA_CONFIG_NAME, TXDATA_DEFAULT_PROFILE, TXDATA_DIR, vcs::{GITIGNORE_NAME, TEMPLATE_EXTENSION, VcsOption}};
+use dxm_init::{vcs::*, *};
 use dxm_manifest::{MANIFEST_NAME, Manifest};
 use tempfile::tempdir;
 
@@ -25,8 +25,18 @@ fn init_vcs_git() {
     assert!(dir_path.join(".git").exists());
     assert!(dir_path.join(GITIGNORE_NAME).exists());
     assert!(data_path.join(GITIGNORE_NAME).exists());
-    assert!(data_path.join(ENV_CFG_NAME).with_added_extension(TEMPLATE_EXTENSION).exists());
-    assert!(data_path.join(SECRETS_CFG_NAME).with_added_extension(TEMPLATE_EXTENSION).exists());
+    assert!(
+        data_path
+            .join(ENV_CFG_NAME)
+            .with_added_extension(TEMPLATE_EXTENSION)
+            .exists()
+    );
+    assert!(
+        data_path
+            .join(SECRETS_CFG_NAME)
+            .with_added_extension(TEMPLATE_EXTENSION)
+            .exists()
+    );
 }
 
 fn assert_init(dir_path: &std::path::Path) -> Manifest {

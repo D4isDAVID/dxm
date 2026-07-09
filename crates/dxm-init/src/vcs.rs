@@ -1,6 +1,6 @@
 //! Contains code for initializing VCS repositories and files.
 
-use std::{error::Error, fmt::Display, path::Path, str::FromStr};
+use std::{error::Error, ffi::OsString, fmt::Display, path::Path, str::FromStr};
 
 use dxm_manifest::Manifest;
 use git2::Repository;
@@ -81,10 +81,19 @@ where
     P: AsRef<Path>,
 {
     let path = path.as_ref();
+    let name = path.file_name().ok_or_else(|| {
+        std::io::Error::new(
+            std::io::ErrorKind::InvalidFilename,
+            "template path has no filename",
+        )
+    })?;
 
-    let mut dest = path.to_owned();
-    dest.add_extension(TEMPLATE_EXTENSION);
+    let mut new_name = OsString::with_capacity(name.len() + TEMPLATE_EXTENSION.len() + 1);
+    new_name.push(name);
+    new_name.push(".");
+    new_name.push(TEMPLATE_EXTENSION);
 
+    let dest = path.with_file_name(new_name);
     fs_err::copy(path, dest)
 }
 
