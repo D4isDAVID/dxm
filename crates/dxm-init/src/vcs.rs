@@ -27,7 +27,7 @@ pub struct ParseVcsOptionError {
 
 impl Display for ParseVcsOptionError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "unknown vsc option {}", &self.option)?;
+        write!(f, "unknown vsc option {}", self.option)?;
 
         Ok(())
     }

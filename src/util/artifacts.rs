@@ -23,12 +23,12 @@ where
         let source_version = sourcefile::read(&artifact_path)?;
 
         if source_version.is_some_and(|v| v.trim() == version) {
-            log::info!("artifact {} already installed", &version);
+            log::info!("artifact {} already installed", version);
 
             return Ok(());
         }
 
-        log::info!("installing artifact {}", &version);
+        log::info!("installing artifact {}", version);
 
         dxm_artifacts::install(client, platform, version, &artifact_path)?;
         sourcefile::write(artifact_path, version)?;
@@ -72,7 +72,7 @@ where
     let sourcefile_updated = sourcefile::read(&artifact_path)?.is_some_and(|v| v == version);
 
     if lockfile_updated && sourcefile_updated {
-        log::info!("artifact {} already installed", &version);
+        log::info!("artifact {} already installed", version);
 
         return Ok(());
     }
@@ -91,7 +91,7 @@ where
         .transpose()?
         .flatten();
 
-    log::info!("updating to artifact {}", &version);
+    log::info!("updating to artifact {}", version);
 
     dxm_artifacts::install(client, platform, version, &artifact_path)?;
     sourcefile::write(artifact_path, version)?;
