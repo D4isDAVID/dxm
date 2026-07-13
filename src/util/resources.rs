@@ -25,7 +25,13 @@ pub fn update<P>(
 where
     P: AsRef<Path>,
 {
-    install_internal(client, manifest_path, manifest, lockfile, Some(resource_names))
+    install_internal(
+        client,
+        manifest_path,
+        manifest,
+        lockfile,
+        Some(resource_names),
+    )
 }
 
 pub fn install_single<M, P, S>(
@@ -42,7 +48,16 @@ where
     P: AsRef<Path>,
     S: AsRef<str>,
 {
-    install_single_internal(client, manifest_path, resources_path, resources, resource, lock_url, resource_name, false)
+    install_single_internal(
+        client,
+        manifest_path,
+        resources_path,
+        resources,
+        resource,
+        lock_url,
+        resource_name,
+        false,
+    )
 }
 
 pub fn update_single<M, P, S>(
@@ -59,7 +74,16 @@ where
     P: AsRef<Path>,
     S: AsRef<str>,
 {
-    install_single_internal(client, manifest_path, resources_path, resources, resource, lock_url, resource_name, true)
+    install_single_internal(
+        client,
+        manifest_path,
+        resources_path,
+        resources,
+        resource,
+        lock_url,
+        resource_name,
+        true,
+    )
 }
 
 pub fn uninstall_single<P, S>(
@@ -130,13 +154,16 @@ where
     let resources_path = manifest.server.resources(manifest_path);
 
     let mut should_update = false;
-    let iter = resources_to_update.map(|r| {
-        should_update = true;
-        if r.is_empty() {
-        manifest.resources.keys().collect()
-    } else {
-        r
-    }}).unwrap_or_else(|| manifest.resources.keys().collect());
+    let iter = resources_to_update
+        .map(|r| {
+            should_update = true;
+            if r.is_empty() {
+                manifest.resources.keys().collect()
+            } else {
+                r
+            }
+        })
+        .unwrap_or_else(|| manifest.resources.keys().collect());
 
     for resource_name in iter {
         let Some(resource) = manifest.resources.get(resource_name) else {
@@ -163,7 +190,10 @@ where
     Ok(())
 }
 
-#[expect(clippy::too_many_arguments, reason = "internal function to be rewritten")]
+#[expect(
+    clippy::too_many_arguments,
+    reason = "internal function to be rewritten"
+)]
 fn install_single_internal<M, P, S>(
     client: &Client,
     manifest_path: M,
@@ -195,7 +225,10 @@ where
         let resource_path = base_path.join(resource_name);
 
         for (other_resource_name, other_resource) in resources.iter() {
-            let other_path = other_resource.category(resources_path).join(other_resource_name);
+            let other_path = other_resource
+                .category(resources_path)
+                .join(other_resource_name);
+
             if other_path.starts_with(&resource_path) {
                 log::warn!("can't install resource {resource_name} inside another resource");
                 return Ok(None);
@@ -210,14 +243,30 @@ where
 
         let sourcefile_updated = sourcefile::read(&resource_path)?.is_some_and(|u| u == url);
         if sourcefile_updated && (!should_update || lock_url.is_some_and(|u| u == url)) {
-            log::info!("resource {} already {}", resource_name, if should_update { "updated" } else { "installed" });
+            log::info!(
+                "resource {} already {}",
+                resource_name,
+                if should_update {
+                    "updated"
+                } else {
+                    "installed"
+                }
+            );
 
             patch(manifest_path, resource_path, resource, resource_name)?;
 
             return Ok(None);
         }
 
-        log::info!("{} resource {}", if should_update { "upddating" } else { "installing" }, resource_name);
+        log::info!(
+            "{} resource {}",
+            if should_update {
+                "updating"
+            } else {
+                "installing"
+            },
+            resource_name
+        );
 
         let url = dxm_resources::install(&source, &resource_path, nested_path)?.unwrap_or(url);
         sourcefile::write(&resource_path, &url)?;
