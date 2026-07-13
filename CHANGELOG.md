@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [unreleased diff]
 
+## [0.3.3] - 2026-07-13
+
+[0.3.3 diff]
+
+### Fixed
+
+- Resource installation.
+
 ## [0.3.2] - 2026-07-13
 
 [0.3.2 diff]
@@ -161,7 +169,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release.
 
-[unreleased diff]: https://github.com/D4isDAVID/dxm/compare/v0.3.2...main
+[unreleased diff]: https://github.com/D4isDAVID/dxm/compare/v0.3.3...main
+[0.3.3]: https://github.com/D4isDAVID/dxm/releases/tag/v0.3.3
+[0.3.3 diff]: https://github.com/D4isDAVID/dxm/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/D4isDAVID/dxm/releases/tag/v0.3.2
 [0.3.2 diff]: https://github.com/D4isDAVID/dxm/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/D4isDAVID/dxm/releases/tag/v0.3.1

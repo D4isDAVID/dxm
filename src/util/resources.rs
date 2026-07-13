@@ -225,12 +225,16 @@ where
         let resource_path = base_path.join(resource_name);
 
         for (other_resource_name, other_resource) in resources.iter() {
+            if resource_name == other_resource_name {
+                continue;
+            }
+
             let other_path = other_resource
                 .category(resources_path)
                 .join(other_resource_name);
 
-            if other_path.starts_with(&resource_path) {
-                log::warn!("can't install resource {resource_name} inside another resource");
+            if resource_path.starts_with(&other_path) {
+                log::warn!("can't install resource '{resource_name}' inside another resource");
                 return Ok(None);
             }
         }
