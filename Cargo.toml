@@ -18,9 +18,9 @@ include = [
 [workspace.dependencies]
 clap = { version = "4.6.1", default-features = false, features = ["std", "help", "usage", "error-context", "cargo"] }
 dirs = "6.0.0"
-dxm-artifacts = { path = "./crates/dxm-artifacts", version = "0.3.0" }
-dxm-home = { path = "./crates/dxm-home", version = "0.1.6" }
-dxm-init = { path = "./crates/dxm-init", version = "0.3.0" }
+dxm-artifacts = { path = "./crates/dxm-artifacts", version = "0.3.1" }
+dxm-home = { path = "./crates/dxm-home", version = "0.1.7" }
+dxm-init = { path = "./crates/dxm-init", version = "0.3.1" }
 dxm-manifest = { path = "./crates/dxm-manifest", version = "0.5.1" }
 dxm-resources = { path = "./crates/dxm-resources", version = "0.3.0" }
 fern = "0.7.1"

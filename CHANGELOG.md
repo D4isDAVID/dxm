@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [unreleased diff]
 
+## [0.3.2] - 2026-07-13
+
+[0.3.2 diff]
+
 ### Added
 
 - Supplying custom artifacts path on init with `dxm init --artifact <path>` and
@@ -18,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Removing a resource that exists in the manifest but isn't installed.
 - Resources being installable inside other resource installations.
+- Init paths for `README.md` and `txData`.
 
 ## [0.3.1] - 2026-05-20
 
@@ -156,7 +161,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial release.
 
-[unreleased diff]: https://github.com/D4isDAVID/dxm/compare/v0.3.1...main
+[unreleased diff]: https://github.com/D4isDAVID/dxm/compare/v0.3.2...main
+[0.3.2]: https://github.com/D4isDAVID/dxm/releases/tag/v0.3.2
+[0.3.2 diff]: https://github.com/D4isDAVID/dxm/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/D4isDAVID/dxm/releases/tag/v0.3.1
 [0.3.1 diff]: https://github.com/D4isDAVID/dxm/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/D4isDAVID/dxm/releases/tag/v0.3.0

@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [dxm unreleased]
 
+## 0.3.1 - 2026-07-13
+
+[dxm 0.3.2]
+
 ### Changed
 
 - Bumped `tar` to `0.4.46`.
@@ -78,6 +82,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial release.
 
 [dxm unreleased]: https://github.com/D4isDAVID/dxm/commits/main/crates/dxm-artifacts
+[dxm 0.3.2]: https://github.com/D4isDAVID/dxm/commits/v0.3.2/crates/dxm-artifacts
 [dxm 0.3.0]: https://github.com/D4isDAVID/dxm/commits/v0.3.0/crates/dxm-artifacts
 [dxm 0.2.4]: https://github.com/D4isDAVID/dxm/commits/v0.2.4/crates/dxm-artifacts
 [dxm 0.2.3]: https://github.com/D4isDAVID/dxm/commits/v0.2.3/crates/dxm-artifacts
