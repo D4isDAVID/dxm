@@ -100,6 +100,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         &client,
         &manifest_path,
         manifest.server.resources(&manifest_path),
+        resources,
         &resources[name],
         lockfile.get_resource_url(name),
         name,

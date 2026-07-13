@@ -1,4 +1,4 @@
-use std::{error::Error, fs, path::Path};
+use std::{collections::HashMap, error::Error, fs, path::Path};
 
 use dxm_manifest::{Manifest, lockfile::Lockfile, resource::Resource, sourcefile};
 use reqwest::blocking::Client;
@@ -12,26 +12,7 @@ pub fn install<P>(
 where
     P: AsRef<Path>,
 {
-    let manifest_path = manifest_path.as_ref();
-
-    let resources_path = manifest.server.resources(manifest_path);
-
-    for (resource_name, resource) in manifest.resources.iter() {
-        let lock_url = install_single(
-            client,
-            manifest_path,
-            &resources_path,
-            resource,
-            lockfile.get_resource_url(resource_name),
-            resource_name,
-        )?;
-
-        if let Some(lock_url) = lock_url {
-            lockfile.set_resource_url(resource_name, lock_url);
-        }
-    }
-
-    Ok(())
+    install_internal(client, manifest_path, manifest, lockfile, None)
 }
 
 pub fn update<P>(
@@ -44,44 +25,14 @@ pub fn update<P>(
 where
     P: AsRef<Path>,
 {
-    let manifest_path = manifest_path.as_ref();
-
-    let resources_path = manifest.server.resources(manifest_path);
-
-    let iter = if resource_names.is_empty() {
-        manifest.resources.keys().collect()
-    } else {
-        resource_names
-    };
-
-    for resource_name in iter {
-        let Some(resource) = manifest.resources.get(resource_name) else {
-            log::warn!("no such resource {resource_name}");
-
-            continue;
-        };
-
-        let lock_url = update_single(
-            client,
-            manifest_path,
-            &resources_path,
-            resource,
-            lockfile.get_resource_url(resource_name),
-            resource_name,
-        )?;
-
-        if let Some(lock_url) = lock_url {
-            lockfile.set_resource_url(resource_name, lock_url);
-        }
-    }
-
-    Ok(())
+    install_internal(client, manifest_path, manifest, lockfile, Some(resource_names))
 }
 
 pub fn install_single<M, P, S>(
     client: &Client,
     manifest_path: M,
     resources_path: P,
+    resources: &HashMap<String, Resource>,
     resource: &Resource,
     lock_url: Option<&str>,
     resource_name: S,
@@ -91,49 +42,14 @@ where
     P: AsRef<Path>,
     S: AsRef<str>,
 {
-    let manifest_path = manifest_path.as_ref();
-    let resources_path = resources_path.as_ref();
-    let resource_name = resource_name.as_ref();
-
-    if let Some(url) = lock_url.or(resource.url()) {
-        let base_path = resource.category(resources_path);
-        let nested_path = resource.nested_path();
-        let resource_path = base_path.join(resource_name);
-
-        log::debug!("resolving resource url {}", url);
-
-        let source = dxm_resources::resolve(client, url)?;
-        let url = source.url();
-        log::debug!("resolved resource url to {}", source);
-
-        let source_url = sourcefile::read(&resource_path)?;
-        if source_url.is_some_and(|u| u == url) {
-            log::info!("resource {} already installed", resource_name);
-
-            patch(manifest_path, resource_path, resource, resource_name)?;
-
-            return Ok(None);
-        }
-
-        log::info!("installing resource {}", resource_name);
-
-        let url = dxm_resources::install(&source, &resource_path, nested_path)?.unwrap_or(url);
-        sourcefile::write(&resource_path, &url)?;
-
-        patch(manifest_path, resource_path, resource, resource_name)?;
-
-        Ok(Some(url))
-    } else {
-        log::warn!("no download url found for {}", resource_name);
-
-        Ok(None)
-    }
+    install_single_internal(client, manifest_path, resources_path, resources, resource, lock_url, resource_name, false)
 }
 
 pub fn update_single<M, P, S>(
     client: &Client,
     manifest_path: M,
     resources_path: P,
+    resources: &HashMap<String, Resource>,
     resource: &Resource,
     lock_url: Option<&str>,
     resource_name: S,
@@ -143,42 +59,7 @@ where
     P: AsRef<Path>,
     S: AsRef<str>,
 {
-    let manifest_path = manifest_path.as_ref();
-    let resources_path = resources_path.as_ref();
-    let resource_name = resource_name.as_ref();
-
-    if let Some(url) = resource.url() {
-        let base_path = resource.category(resources_path);
-        let nested_path = resource.nested_path();
-        let resource_path = base_path.join(resource_name);
-
-        let source = dxm_resources::resolve(client, url)?;
-        let url = source.url();
-        log::debug!("resolved resource url to {}", url);
-
-        let lockfile_updated = lock_url.is_some_and(|u| u == url);
-        let sourcefile_updated = sourcefile::read(&resource_path)?.is_some_and(|u| u == url);
-
-        if lockfile_updated && sourcefile_updated {
-            log::info!("resource {} already updated", resource_name);
-
-            patch(manifest_path, resource_path, resource, resource_name)?;
-
-            return Ok(None);
-        }
-
-        log::info!("updating resource {}", resource_name);
-
-        let url = dxm_resources::install(&source, &resource_path, nested_path)?.unwrap_or(url);
-        sourcefile::write(&resource_path, &url)?;
-
-        patch(manifest_path, resource_path, resource, resource_name)?;
-
-        Ok(Some(url))
-    } else {
-        log::warn!("no download url found for {}", resource_name);
-        Ok(None)
-    }
+    install_single_internal(client, manifest_path, resources_path, resources, resource, lock_url, resource_name, true)
 }
 
 pub fn uninstall_single<P, S>(
@@ -198,9 +79,13 @@ where
 
     log::info!("uninstalling resource {}", resource_name);
 
-    fs::remove_dir_all(resource_path)?;
-
-    Ok(())
+    match fs::remove_dir_all(resource_path) {
+        Ok(_) => Ok(()),
+        Err(err) => match err.kind() {
+            std::io::ErrorKind::NotFound => Ok(()),
+            _ => Err(err)?,
+        },
+    }
 }
 
 fn patch<M, R, S>(
@@ -228,4 +113,121 @@ where
     }
 
     Ok(())
+}
+
+fn install_internal<P>(
+    client: &Client,
+    manifest_path: P,
+    manifest: &Manifest,
+    lockfile: &mut Lockfile,
+    resources_to_update: Option<Vec<&String>>,
+) -> Result<(), Box<dyn Error>>
+where
+    P: AsRef<Path>,
+{
+    let manifest_path = manifest_path.as_ref();
+
+    let resources_path = manifest.server.resources(manifest_path);
+
+    let mut should_update = false;
+    let iter = resources_to_update.map(|r| {
+        should_update = true;
+        if r.is_empty() {
+        manifest.resources.keys().collect()
+    } else {
+        r
+    }}).unwrap_or_else(|| manifest.resources.keys().collect());
+
+    for resource_name in iter {
+        let Some(resource) = manifest.resources.get(resource_name) else {
+            log::warn!("no such resource {resource_name}");
+            continue;
+        };
+
+        let lock_url = install_single_internal(
+            client,
+            manifest_path,
+            &resources_path,
+            &manifest.resources,
+            resource,
+            lockfile.get_resource_url(resource_name),
+            resource_name,
+            should_update,
+        )?;
+
+        if let Some(lock_url) = lock_url {
+            lockfile.set_resource_url(resource_name, lock_url);
+        }
+    }
+
+    Ok(())
+}
+
+#[expect(clippy::too_many_arguments, reason = "internal function to be rewritten")]
+fn install_single_internal<M, P, S>(
+    client: &Client,
+    manifest_path: M,
+    resources_path: P,
+    resources: &HashMap<String, Resource>,
+    resource: &Resource,
+    lock_url: Option<&str>,
+    resource_name: S,
+    should_update: bool,
+) -> Result<Option<String>, Box<dyn Error>>
+where
+    M: AsRef<Path>,
+    P: AsRef<Path>,
+    S: AsRef<str>,
+{
+    let manifest_path = manifest_path.as_ref();
+    let resources_path = resources_path.as_ref();
+    let resource_name = resource_name.as_ref();
+
+    let url = if should_update {
+        resource.url()
+    } else {
+        lock_url.or(resource.url())
+    };
+
+    if let Some(url) = url {
+        let base_path = resource.category(resources_path);
+        let nested_path = resource.nested_path();
+        let resource_path = base_path.join(resource_name);
+
+        for (other_resource_name, other_resource) in resources.iter() {
+            let other_path = other_resource.category(resources_path).join(other_resource_name);
+            if other_path.starts_with(&resource_path) {
+                log::warn!("can't install resource {resource_name} inside another resource");
+                return Ok(None);
+            }
+        }
+
+        log::debug!("resolving resource url {}", url);
+
+        let source = dxm_resources::resolve(client, url)?;
+        let url = source.url();
+        log::debug!("resolved resource url to {}", source);
+
+        let sourcefile_updated = sourcefile::read(&resource_path)?.is_some_and(|u| u == url);
+        if sourcefile_updated && (!should_update || lock_url.is_some_and(|u| u == url)) {
+            log::info!("resource {} already {}", resource_name, if should_update { "updated" } else { "installed" });
+
+            patch(manifest_path, resource_path, resource, resource_name)?;
+
+            return Ok(None);
+        }
+
+        log::info!("{} resource {}", if should_update { "upddating" } else { "installing" }, resource_name);
+
+        let url = dxm_resources::install(&source, &resource_path, nested_path)?.unwrap_or(url);
+        sourcefile::write(&resource_path, &url)?;
+
+        patch(manifest_path, resource_path, resource, resource_name)?;
+
+        Ok(Some(url))
+    } else {
+        log::warn!("no download url found for {}", resource_name);
+
+        Ok(None)
+    }
 }

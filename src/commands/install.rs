@@ -37,7 +37,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
         crate::util::artifacts::install_monitor(
             &client,
             &manifest_path,
-            &manifest.artifact,
+            &manifest,
             &platform,
             monitor,
             &mut lockfile,

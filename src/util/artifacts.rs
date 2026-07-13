@@ -109,7 +109,7 @@ where
 pub fn install_monitor<P>(
     client: &Client,
     manifest_path: P,
-    artifact: &Artifact,
+    manifest: &Manifest,
     platform: &ArtifactsPlatform,
     resource: &Resource,
     lockfile: &mut Lockfile,
@@ -119,6 +119,7 @@ where
 {
     let manifest_path = manifest_path.as_ref();
 
+    let artifact = &manifest.artifact;
     let resources_path = artifact.system_resources(manifest_path, platform);
 
     let vacated_monitor = dxm_resources::VacatedDir::new(
@@ -130,6 +131,7 @@ where
         client,
         manifest_path,
         resources_path,
+        &manifest.resources,
         resource,
         lockfile.monitor_url(),
         MONITOR_RESOURCE,
@@ -155,7 +157,7 @@ where
 pub fn update_monitor<P>(
     client: &Client,
     manifest_path: P,
-    artifact: &Artifact,
+    manifest: &Manifest,
     platform: &ArtifactsPlatform,
     resource: &Resource,
     lockfile: &mut Lockfile,
@@ -165,12 +167,14 @@ where
 {
     let manifest_path = manifest_path.as_ref();
 
+    let artifact = &manifest.artifact;
     let resources_path = artifact.system_resources(manifest_path, platform);
 
     let lock_url = crate::util::resources::update_single(
         client,
         manifest_path,
         resources_path,
+        &manifest.resources,
         resource,
         lockfile.monitor_url(),
         MONITOR_RESOURCE,

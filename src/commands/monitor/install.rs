@@ -46,9 +46,7 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let (manifest_path, mut manifest) = crate::util::manifest::find(manifest_path)?;
     let mut lockfile = Lockfile::read(&manifest_path)?;
 
-    let artifact = &mut manifest.artifact;
-
-    if artifact.monitor().is_some() {
+    if manifest.artifact.monitor().is_some() {
         log::error!("a third-party monitor is already installed");
 
         return Ok(());
@@ -62,13 +60,13 @@ pub fn execute(args: &ArgMatches) -> Result<(), Box<dyn Error>> {
     crate::util::artifacts::install_monitor(
         &client,
         &manifest_path,
-        artifact,
+        &manifest,
         &platform,
         &resource,
         &mut lockfile,
     )?;
 
-    artifact.set_monitor(resource);
+    manifest.artifact.set_monitor(resource);
 
     manifest.write_artifact(&manifest_path)?;
     lockfile.write(&manifest_path)?;

@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Supplying custom artifacts path on init with `dxm init --artifact <path>` and
   `dxm new --artifact <path>`.
 
+### Fixed
+
+- Removing a resource that exists in the manifest but isn't installed.
+- Resources being installable inside other resource installations.
+
 ## [0.3.1] - 2026-05-20
 
 [0.3.1 diff]
